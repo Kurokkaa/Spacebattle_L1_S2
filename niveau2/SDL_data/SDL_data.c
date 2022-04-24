@@ -114,7 +114,7 @@ void right_limit(sprite_t* sprite){
 }
 
 void bottom_limit(sprite_t* sprite){
-    if(sprite->y>=SCREEN_HEIGHT){ //si l'ennemi dépasse le bas de l'écran on le replace en haut
+    if(sprite->y>=SCREEN_HEIGHT){
         sprite->y=0;
     }
 }
