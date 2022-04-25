@@ -27,7 +27,7 @@ typedef struct textures_s textures_t;
  * @param h la  hauteur du sprite
  * @param w la largeur du sprite 
  * @param v la vitesse vertical du sprite 
- * 
+ * @param is_visible le sprite doit-il être affiché ou non  
  */
 
 struct sprite_s
@@ -39,6 +39,7 @@ struct sprite_s
     int w;
     int v;
     int is_visible; 
+    int is_apply;  
 };
 
 typedef struct sprite_s sprite_t;

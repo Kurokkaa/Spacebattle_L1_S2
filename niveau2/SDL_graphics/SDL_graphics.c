@@ -32,26 +32,33 @@ void clean(SDL_Window *window, SDL_Renderer * renderer, textures_t *textures, wo
     clean_sdl(renderer,window);
 }
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite){
-    if(sprite->is_visible==1){
+    if(sprite->is_visible==1){ //si le sprite est visible on l'applique sinon 
         SDL_Rect dst = {0, 0, 0, 0};
     
         SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
         dst.x = sprite->x; dst.y=sprite->y;
         SDL_RenderCopy(renderer, texture, NULL, &dst);
     }
+    else{
+        if(!(sprite->is_apply)){ //s'il ne doit pas être appliqué on nettoie
+        clean_texture(texture);
+    }
 }
-
+}
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *textures){
     
     //on vide le renderer
     clear_renderer(renderer);
+
+    
     
     //application des textures dans le renderer
     apply_background(renderer, textures);
     apply_sprite(renderer,textures->skin_ship,&(world->ship));
     apply_sprite(renderer,textures->skin_ennemy,&(world->ennemi));
+    if(world->missile.is_apply){
     apply_sprite(renderer,textures->missile,&world->missile);
-   
+   }
 
     
     

@@ -16,7 +16,7 @@
  */
 
 
-int main( int argc, char* args[] )
+int WinMain( int argc, char* args[] )
 {
     SDL_Event event;
     world_t world;

@@ -43,4 +43,5 @@ void init(SDL_Window **window, SDL_Renderer ** renderer, textures_t *textures, w
 void apply_background(SDL_Renderer *renderer, textures_t *textures);
 
 
+
 #endif

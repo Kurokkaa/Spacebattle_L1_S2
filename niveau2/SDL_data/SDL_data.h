@@ -112,9 +112,20 @@ void right_limit(sprite_t* sprite);
 void left_limit(sprite_t* sprite);
 
 /**
- * @brief fonction qui va repositionner l'ennemi en haut de l'ecran
+ * @brief fonction qui va repositionner l'ennemi en haut de l'ecran s'il dépasse le bas de l'écran
  * 
  * @param sprite l'ennemi
  */
 void bottom_limit(sprite_t* sprite);
+/**
+ * @brief retourne 1 si une collision entre les deux sprites à lieu sinon 0
+ * @param *spa pointeur vers le 1eme sprite
+ * @param *sp2 pointeur vers le 2eme sprite
+ */
+int sprites_collide(sprite_t *sp2, sprite_t *sp1);
+
+void handle_sprites_collision(sprite_t *sp2, sprite_t *sp1);
+
+void init_ennemies(world_t* world);
+
 #endif
