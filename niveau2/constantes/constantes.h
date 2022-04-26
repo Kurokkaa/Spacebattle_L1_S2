@@ -38,6 +38,6 @@
 /**
  * @brief vitesse verticale du missile
  */
-#define MISSILE_SPEED 10
+#define MISSILE_SPEED 5
 
 #endif

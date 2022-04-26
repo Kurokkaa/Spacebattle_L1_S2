@@ -1,0 +1,32 @@
+CFLAGS = -O3 -Dmain=SDL_main 
+LDFLAGS = -lm -lmingw32 -lSDL2main -lSDL2  -lSDL2_TTF 
+SDL2_INCLUDE_DIR = "..\SDL2-2.0.20\x86_64-w64-mingw32\include"
+SDL2_LIBRARIES_DIR = "..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
+INC = sld2\sdl2-light.h SDL_data\SDL_data.h SDL_graphics\SDL_graphics.h constantes\constantes.h struct\struct.h sdl2\sdl2-ttf-light.h 
+SRC = main.c sdl2\sdl2-light.c struct\struct.c SDL_data\SDL_data.c SDL_graphics\SDL_graphics.c sdl2\sdl2-ttf-light.c  
+OBJ = $(SRC:%.c=%.o)
+PROG = spacebattle.exe
+CC=gcc
+
+DEFAULT:$(PROG) clean
+
+$(PROG): $(OBJ)
+	gcc $(CFLAGS) $(OBJ) $(LDFLAGS) -o $@ -L "..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
+
+%.o: %.c $(@D)\$(INC)
+	gcc $(CFLAGS) -c $(@D)\$< -L "\..\SDL2-2.0.20\x86_64-w64-mingw32\include"
+
+doc: $(PROG)
+	doxygen $(PROG)
+test:SDL_data\test.exe 
+SDL_data\test.exe: SDL_data\tests.o SDL_data\sdl_data.o
+	gcc $(CFLAGS) $^ $(LDFLAGS) -o $@ -L "..\..\..\SDL2-2.0.20\x86_64-w64-mingw32\lib"	
+
+tests.o:SDL_data\tests.c
+	gcc $(CFLAGS) -c $< 
+
+
+.PHONY: clean test
+clean:
+	del /S *.o
+	

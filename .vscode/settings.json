@@ -5,7 +5,10 @@
         "sdl_main.h": "c",
         "begin_code.h": "c",
         "sdl_render.h": "c",
-        "struct.h": "c"
+        "struct.h": "c",
+        "sdl_ttf.h": "c",
+        "sdl2-ttf-light.h": "c",
+        "sdl_data.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
