@@ -42,21 +42,12 @@
 /**
  * @brief nombres d'ennemie
  */
-#define NB_ENEMIES 10
-/**
- * @brief distance vertical entre deux ennemies
- * 
- */
+#define NB_ENEMIES 1
+
 #define VERTICAL_DIST (2*SHIP_SIZE)
-/**
- * @brief nombre d'itération à attendre avant de fermer le jeu
- * 
- */
+
 #define TIME_ENDING 270
-/**
- * @brief énumeration afin de gérer les différents états du jeu
- * 
- */
+
 enum etat {gagnant,perdu,fin,jeu,menu};
 
 #endif

@@ -8,10 +8,10 @@
 
 
 /**
- * \brief Représentation pour stocker les ressources nécessaires à l'affichage graphique
+ * \brief Représentation pour stocker les textures nécessaires à l'affichage graphique
 */
 
-struct ressources_s
+struct textures_s
 {
     SDL_Texture* background; /*!< Texture liée à l'image du fond de l'écran. */
     SDL_Texture* skin_ship; /*!< apparence du vaisseau*/
@@ -21,7 +21,7 @@ struct ressources_s
     SDL_Texture* menu_sprite;
 };
 
-typedef struct ressources_s ressources_t;
+typedef struct textures_s textures_t;
 
 
 
@@ -76,101 +76,9 @@ struct world_s
 };
 
 typedef struct world_s world_t;
-/**
- * @brief retourne la valeur de is_apply
- * 
- * @param sprite 
- * @return int la valeur d'is_apply
- */
-int get_is_apply(sprite_t* sprite);
-/**
- * @brief retourne la valeur de is_invisible
- * 
- * @param sprite 
- * @return int 
- */
-int get_is_visible(sprite_t* sprite);
 
-/**
- * @brief retourne la valeur de x 
- * 
- * @param sprite 
- * @return int 
- */
-int get_x(sprite_t* sprite);
-/**
- * @brief retourne la valeur de y
- * 
- * @param sprite 
- * @return int 
- */
-int get_y(sprite_t* sprite);
-/**
- * @brief retourne la valeur de h
- * 
- * @param sprite 
- * @return int 
- */
-int get_h(sprite_t* sprite);
-/**
- * @brief retourne la valeur de w
- * 
- * @param sprite 
- * @return int 
- */
-int get_w(sprite_t* sprite);
-/**
- * @brief retourne la valeur de v
- * 
- * @param sprite 
- * @return int 
- */
-int get_v(sprite_t* sprite);
-/**
- * @brief met is_visible à 1
- * @param sprite 
- */
-void set_visible(sprite_t* sprite);
-/**
- * @brief met is_visible à 0
- * 
- */
-void set_invisible(sprite_t* sprite);
-/**
- * @brief change la valeur de x
- * 
- * @param sprite 
- * @param x 
- */
-void set_x(sprite_t* sprite,int x);
-/**
- * @brief change la valeur de y
- * 
- * @param sprite 
- * @param y
- */
-void set_y(sprite_t* sprite,int y);
-/**
- * @brief change la valeur de h
- * 
- * @param sprite 
- * @param h
- */
-void set_h(sprite_t* sprite,int h);
-/**
- * @brief change la valeur de w
- * 
- * @param sprite 
- * @param w 
- */
-void set_w(sprite_t* sprite,int w);
-/**
- * @brief change la valeur de v
- * 
- * @param sprite 
- * @param v 
- */
-void set_v(sprite_t* sprite,int v );
+
+
 #endif
 
 
