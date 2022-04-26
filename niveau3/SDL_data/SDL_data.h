@@ -103,13 +103,7 @@ void handle_events(SDL_Event *event,world_t *world);
  */
 void init_sprite(sprite_t *sprite, int x, int y, int w, int h, int v);
 
-/**
- * \brief La fonction applique la texture du fond sur le renderer lié à l'écran de jeu
- * \param renderer le renderer
- * \param textures les textures du jeu
-*/
 
-void apply_background(SDL_Renderer *renderer, textures_t *textures);
 
 /**
  * @brief la fonction bloque le vaisseau sur la droite pour qu'il ne sorte pas de l'écran
@@ -174,7 +168,7 @@ void replace_missile(world_t* world);
 void handle_ennemies(world_t* world);
 void compute_game(world_t* world);
 
-void init(SDL_Window **window, SDL_Renderer ** renderer, textures_t *textures, world_t * world);
+void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world);
 /**
  * @brief déplace le missile
  * @param world le monde

@@ -9,39 +9,39 @@
 
 
 
-void clean_textures(textures_t *textures){
-    clean_texture(textures->background);
-    clean_texture(textures->skin_ship);
-    clean_texture(textures->skin_ennemy);
-    clean_texture(textures->missile);
+void clean_textures(ressources_t *ressources){
+    clean_texture(ressources->background);
+    clean_texture(ressources->skin_ship);
+    clean_texture(ressources->skin_ennemy);
+    clean_texture(ressources->missile);
 }
 
-void init_textures_enemies(SDL_Renderer *renderer, textures_t *textures){
+void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
     for(int i = 0;i<NB_ENEMIES;i++){
-        textures->skin_ennemy[i]=load_image("ressources/enemy.bmp",renderer);
+        ressources->skin_ennemy[i]=load_image("ressources/enemy.bmp",renderer);
     }
 }
 
 
 
-void  init_textures(SDL_Renderer *renderer, textures_t *textures){
-    textures->background = load_image( "ressources/space-background.bmp",renderer);
+void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
+    ressources->background = load_image( "ressources/space-background.bmp",renderer);
     
-    textures->skin_ship = load_image("ressources/spaceship.bmp",renderer);
+    ressources->skin_ship = load_image("ressources/spaceship.bmp",renderer);
 
-    init_textures_enemies(renderer,textures);
+    init_textures_enemies(renderer,ressources);
 
-    textures->missile = load_image("ressources/missile.bmp", renderer);
+    ressources->missile = load_image("ressources/missile.bmp", renderer);
     
-    textures->font  = load_font("ressources/arial.ttf",14);
+    ressources->font  = load_font("ressources/arial.ttf",14);
 
-    textures->menu_sprite = load_image("ressources/spacebattle.bmp",renderer);
+    ressources->menu_sprite = load_image("ressources/spacebattle.bmp",renderer);
 }
-void clean(SDL_Window *window, SDL_Renderer * renderer, textures_t *textures, world_t * world){
+void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
     clean_data(world);
-    clean_textures(textures);
+    clean_textures(ressources);
     clean_sdl(renderer,window);
-    clean_font(textures->font);
+    clean_font(ressources->font);
 }
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite){
     if(sprite->is_visible==1){ //si le sprite est visible on l'applique sinon 
@@ -57,11 +57,11 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
     }
 }
 }
-void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *textures){
+void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources){
     char number[15];
     //on vide le renderer
     clear_renderer(renderer);
-    apply_background(renderer,textures);
+    apply_background(renderer,ressources);
     sprintf(number,"%d",world->score);
     switch (world->state)
      
@@ -69,54 +69,40 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,textures_t *texture
     case jeu:
         
        
-        apply_sprite(renderer,textures->skin_ship,&(world->ship));
-        apply_enemies(renderer,textures->skin_ennemy,world->enemies);
+        apply_sprite(renderer,ressources->skin_ship,&(world->ship));
+        apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
         if(world->missile.is_apply){
-            apply_sprite(renderer,textures->missile,&world->missile);
+            apply_sprite(renderer,ressources->missile,&world->missile);
          }
-        apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",textures->font);
-        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,textures->font);
+        apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case gagnant:
-        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",textures->font);
-        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/6,40, "score;",textures->font);
-        apply_text(renderer,SCREEN_WIDTH/3 + SCREEN_WIDTH/6 ,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/15,40,number,textures->font);
+        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/6,40, "score;",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/3 + SCREEN_WIDTH/6 ,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case perdu:
-        printf("%s",number);
-        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",textures->font);
-        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,textures->font);
+        
+        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case fin:
-        
-        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"Game Over ! ",textures->font);
-        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,textures->font);
+        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"Game Over ! ",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
     case menu:
-        apply_texture(textures->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/5);
-        apply_text(renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/5+100,SCREEN_WIDTH/3,50,"PRESS SPACE TO START ",textures->font);
-        
+        apply_texture(ressources->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/5);
+        apply_text(renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/5+100,SCREEN_WIDTH/3,50,"PRESS SPACE TO START ",ressources->font);
         break;
-    default:
-        break;
-    }
-    
-    //application des textures dans le renderer
-   
-    
-   
-    
-    
-    
-    
-    
+    }    
     // on met à jour l'écran
     update_screen(renderer);
 }
 
 
-void apply_background(SDL_Renderer *renderer, textures_t *textures){
-    if(textures->background != NULL){
-      apply_texture(textures->background, renderer, 0, 0);
+void apply_background(SDL_Renderer *renderer, ressources_t *ressources){
+    if(ressources->background != NULL){
+      apply_texture(ressources->background, renderer, 0, 0);
     }
 }
 
