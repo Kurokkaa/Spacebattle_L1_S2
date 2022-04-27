@@ -78,38 +78,21 @@ struct world_s
 typedef struct world_s world_t;
 
 int get_is_apply(sprite_t* sprite);
-
 int get_is_visible(sprite_t* sprite);
-
-
 int get_x(sprite_t* sprite);
-
 int get_y(sprite_t* sprite);
-
 int get_h(sprite_t* sprite);
-
 int get_w(sprite_t* sprite);
-
 int get_v(sprite_t* sprite);
-
 void set_visible(sprite_t* sprite);
-
 void set_invisible(sprite_t* sprite);
-
 void set_x(sprite_t* sprite,int x);
-
 void set_y(sprite_t* sprite,int y);
-
 void set_h(sprite_t* sprite,int h);
-
 void set_w(sprite_t* sprite,int w);
-
 void set_v(sprite_t* sprite,int v );
-
 void set_apply(sprite_t* sprite);
-
 void set_not_apply(sprite_t* sprite);
-
 #endif
 
 

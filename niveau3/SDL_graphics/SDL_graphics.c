@@ -37,7 +37,7 @@ void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
  * @param renderer le renderer
  * @param ressources les ressources
  */
-void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
+void init_textures(SDL_Renderer *renderer, ressources_t *ressources){
     ressources->background = load_image( "ressources/space-background.bmp",renderer);
     
     ressources->skin_ship = load_image("ressources/spaceship.bmp",renderer);
@@ -154,3 +154,17 @@ void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t spri
     }
 }
 
+/**
+ * @brief initialise les différents module
+ * 
+ * @param window 
+ * @param renderer 
+ * @param ressources 
+ * @param world 
+ */
+void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world){
+    init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_data(world);
+    init_ttf();
+    init_textures(*renderer,ressources);
+}

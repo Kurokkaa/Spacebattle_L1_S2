@@ -29,20 +29,7 @@ void init_data(world_t * world){
     world->timer_end=0;
 }
 
-/**
- * @brief initialise les différents module
- * 
- * @param window 
- * @param renderer 
- * @param ressources 
- * @param world 
- */
-void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world){
-    init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
-    init_data(world);
-    init_ttf();
-    init_textures(*renderer,ressources);
-}
+
 
 /**
  * @brief afficher les données d'un sprite

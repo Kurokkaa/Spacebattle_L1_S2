@@ -45,32 +45,16 @@ void init_sprite(sprite_t *sprite, int x, int y, int w, int h, int v);
 
 
 
-
 void right_limit(sprite_t* sprite);
-
-
 void left_limit(sprite_t* sprite);
-
-
 void bottom_limit(sprite_t* sprite);
-
 int sprites_collide(sprite_t *sp2, sprite_t *sp1);
-
-
 void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2,world_t* world);
-
-
 void init_ennemies(world_t* world);
-
 void update_ennemies(world_t* world);
-
-
 void replace_missile(world_t* world);
-
-
 void handle_ennemies(world_t* world);
 void compute_game(world_t* world);
-void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world);
 void move_missile(world_t* world);
 int generate_number(int a, int b);
 
