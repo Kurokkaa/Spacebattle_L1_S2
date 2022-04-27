@@ -78,12 +78,12 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
         dst.x = sprite->x; dst.y=sprite->y;
         SDL_RenderCopy(renderer, texture, NULL, &dst);
     }
-    else{
-        if(!(sprite->is_apply)){ //s'il ne doit pas être appliqué on nettoie
+    //si le vaisseau n'est ni affiché ni appliqué la texture est nettoyé
+    else if(!(sprite->is_apply)){ //s'il ne doit pas être appliqué on nettoie
         clean_texture(texture);
     }
 }
-}
+
 /**
  * @brief met à jour le renderer
  * 
@@ -92,15 +92,17 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
  * @param ressources les ressources
  */
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources){
-    char number[15];
+    //tableau qui accueillera le score
+    char number[15]; 
     //on vide le renderer
     clear_renderer(renderer);
     apply_background(renderer,ressources);
     //le score est transformé en chaine de caractéres
     sprintf(number,"%d",world->score);
+    //on change l'affichage selon l'etat du jeu
     switch (world->state)  
     {
-    case jeu:
+    case jeu: 
         apply_sprite(renderer,ressources->skin_ship,&(world->ship));
         apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
         if(world->missile.is_apply){
