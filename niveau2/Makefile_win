@@ -1,7 +1,7 @@
 CFLAGS = -O3 -Dmain=SDL_main 
 LDFLAGS = -lm -lmingw32 -lSDL2main -lSDL2
-SDL2_INCLUDE_DIR = "..\..\..\SDL2-2.0.20\x86_64-w64-mingw32\include"
-SDL2_LIBRARIES_DIR = "..\..\..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
+SDL2_INCLUDE_DIR = "..\SDL2-2.0.20\x86_64-w64-mingw32\include"
+SDL2_LIBRARIES_DIR = "..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
 INC = sdl2-light.h SDL_data\SDL_data.h SDL_graphics\SDL_graphics.h constantes\constantes.h struct\struct.h
 SRC = main.c SDL2\sdl2-light.c SDL_data\SDL_data.c SDL_graphics\SDL_graphics.c
 OBJ = $(SRC:%.c=%.o)
@@ -11,7 +11,7 @@ CC=gcc
 DEFAULT:$(PROG) clean
 
 $(PROG): $(OBJ)
-	gcc $(CFLAGS) $(OBJ) $(LDFLAGS) -o $@ -L "..\..\..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
+	gcc $(CFLAGS) $(OBJ) $(LDFLAGS) -o $@ -L "..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
 
 %.o: %.c $(@D)\$(INC)
 	gcc $(CFLAGS) -c $(@D)\$< 

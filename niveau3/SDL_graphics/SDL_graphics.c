@@ -8,14 +8,22 @@
 #include "SDL_graphics.h"
 
 
-
+/**
+ * \brief La fonction nettoie les textures
+ * \param ressources les ressources
+*/
 void clean_textures(ressources_t *ressources){
     clean_texture(ressources->background);
     clean_texture(ressources->skin_ship);
     clean_texture(ressources->skin_ennemy);
     clean_texture(ressources->missile);
 }
-
+/**
+ * @brief 
+ * 
+ * @param renderer le renderer
+ * @param ressources les ressources
+ */
 void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
     for(int i = 0;i<NB_ENEMIES;i++){
         ressources->skin_ennemy[i]=load_image("ressources/enemy.bmp",renderer);
@@ -23,7 +31,12 @@ void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
 }
 
 
-
+/**
+ * @brief charge les images liées au textures 
+ * 
+ * @param renderer le renderer
+ * @param ressources les ressources
+ */
 void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
     ressources->background = load_image( "ressources/space-background.bmp",renderer);
     
@@ -37,12 +50,26 @@ void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
 
     ressources->menu_sprite = load_image("ressources/spacebattle.bmp",renderer);
 }
+/**
+* \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
+* \param window la fenêtre du jeu
+* \param renderer le renderer
+* \param ressources les ressources
+* \param world le monde
+*/
 void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
     clean_data(world);
     clean_textures(ressources);
     clean_sdl(renderer,window);
     clean_font(ressources->font);
 }
+/**
+ * @brief affiche l'entité à la position enregistré dans les données du jeu
+ * 
+ * @param renderer le renderer 
+ * @param texture la texture de l'entité
+ * @param sprite l'entité
+ */
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite){
     if(sprite->is_visible==1){ //si le sprite est visible on l'applique sinon 
         SDL_Rect dst = {0, 0, 0, 0};
@@ -57,18 +84,23 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
     }
 }
 }
+/**
+ * @brief met à jour le renderer
+ * 
+ * @param renderer le renderer
+ * @param world le monde du jeu
+ * @param ressources les ressources
+ */
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources){
     char number[15];
     //on vide le renderer
     clear_renderer(renderer);
     apply_background(renderer,ressources);
+    //le score est transformé en chaine de caractéres
     sprintf(number,"%d",world->score);
-    switch (world->state)
-     
+    switch (world->state)  
     {
     case jeu:
-        
-       
         apply_sprite(renderer,ressources->skin_ship,&(world->ship));
         apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
         if(world->missile.is_apply){
@@ -83,13 +115,13 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,SCREEN_WIDTH/3 + SCREEN_WIDTH/6 ,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case perdu:
-        
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case fin:
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"Game Over ! ",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
+        break;
     case menu:
         apply_texture(ressources->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/5);
         apply_text(renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/5+100,SCREEN_WIDTH/3,50,"PRESS SPACE TO START ",ressources->font);
@@ -99,13 +131,23 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
     update_screen(renderer);
 }
 
-
+/**
+ * \brief La fonction applique la texture du fond sur le renderer lié à l'écran de jeu
+ * \param renderer le renderer
+ * \param ressources les ressources
+*/
 void apply_background(SDL_Renderer *renderer, ressources_t *ressources){
     if(ressources->background != NULL){
       apply_texture(ressources->background, renderer, 0, 0);
     }
 }
-
+/**
+ * @brief affiche les texture des ennemies selon leur position
+ * 
+ * @param renderer le renderer 
+ * @param texture la texture de l'entité
+ * @param sprite l'entité 
+ */
 void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t sprite[]){
     for(int i = 0; i<NB_ENEMIES;i++){
         apply_sprite(renderer,texture[i],&(sprite[i]));
