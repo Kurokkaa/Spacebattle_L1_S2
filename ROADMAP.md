@@ -13,3 +13,11 @@ RoadMap:
 -Ajouter un mode arcade vague ou infini (score)(2)
 -Tableau des scores (3)
 -Ajouter un pseudo pour le HighScore (3)
+-Changer les skins (3)??
+-ajouter un systeme de vie (1)
+
+
+
+Légende:
+-(ordre de priorité)
+-?? pas sûre du tout
