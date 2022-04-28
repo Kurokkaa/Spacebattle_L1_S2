@@ -73,6 +73,7 @@ struct world_s
     int nb_enemies_left;
     int score;
     int timer_end;
+    int life;
 };
 
 typedef struct world_s world_t;
@@ -93,6 +94,7 @@ void set_w(sprite_t* sprite,int w);
 void set_v(sprite_t* sprite,int v );
 void set_apply(sprite_t* sprite);
 void set_not_apply(sprite_t* sprite);
+void life_counter(world_t* world);
 #endif
 
 
