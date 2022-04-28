@@ -27,7 +27,7 @@ void init_data(world_t * world){
     world->nb_enemies_left=NB_ENEMIES; //il reste tous les ennemies au début
     world->nb_enemies_survived=0;      
     world->score=0;
-    world->state=menu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
+    world->state=jeu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
     world->life=3;
 }
@@ -43,14 +43,6 @@ void print_sprite(sprite_t* sprite){
     printf("X: %d\ny: %d\nh: %d\nw: %d\nv: %d\n",sprite->x,sprite->y,sprite->h,sprite->w,sprite->v);
 }
 
-/**
- * \brief La fonction nettoie les données du monde
- * \param world les données du monde
- */
-void clean_data(world_t *world){
-    /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
-    
-}
 
 /**
  * \brief La fonction indique si le jeu est fini en fonction des données du monde
@@ -296,7 +288,7 @@ void init_ennemies(world_t* world){
     int x;
     int y;
     for(i=0;i<NB_ENEMIES;i++){
-        x = generate_number(SHIP_SIZE/2,SCREEN_WIDTH-SHIP_SIZE/2);
+        x = generate_number(0,SCREEN_WIDTH-SHIP_SIZE);
         y = -SHIP_SIZE/2 - i* VERTICAL_DIST;
         init_sprite(&(world->enemies[i]),x,y,SHIP_SIZE,SHIP_SIZE,ENEMY_SPEED);
     }
@@ -318,7 +310,7 @@ void update_ennemies(world_t* world){
  * @param world
  */
 void lose_life(world_t* world){
-    world->life=world->life-1;
+    world->life-=1;
 }
 /**
  * @brief change l'état de la partie en fonction de la situation
@@ -351,7 +343,7 @@ void compute_game(world_t* world){
             //sinon si tous les ennemis sont mort ou a survécu
             else if(world->nb_enemies_left==0){
             //on regarde combien d'ennemi ont survécu
-            //s'ils ont etaient tous détruit
+            //s'ils ont eté tous détruit
             if(world->nb_enemies_survived==0){
                 //le joueur a gagné
                 world->state=gagnant;

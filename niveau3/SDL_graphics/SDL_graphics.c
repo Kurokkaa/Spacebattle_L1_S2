@@ -49,6 +49,10 @@ void init_textures(SDL_Renderer *renderer, ressources_t *ressources){
     ressources->font  = load_font("ressources/arial.ttf",14);
 
     ressources->menu_sprite = load_image("ressources/spacebattle.bmp",renderer);
+
+    ressources->coeur_plein = load_image("ressources/coeur_plein.bmp",renderer);
+    
+    ressources->coeur_vide = load_image("ressources/coeur_vide.bmp",renderer);
 }
 /**
 * \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
@@ -58,7 +62,7 @@ void init_textures(SDL_Renderer *renderer, ressources_t *ressources){
 * \param world le monde
 */
 void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
-    clean_data(world);
+    
     clean_textures(ressources);
     clean_sdl(renderer,window);
     clean_font(ressources->font);
@@ -99,6 +103,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
     apply_background(renderer,ressources);
     //le score est transformé en chaine de caractéres
     sprintf(number,"%d",world->score);
+    
     //on change l'affichage selon l'etat du jeu
     switch (world->state)  
     {
@@ -110,6 +115,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
          }
         apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
+        display_life(renderer,ressources,world);
         break;
     case gagnant:
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",ressources->font);
@@ -171,4 +177,14 @@ void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressource
     init_data(world);
     init_ttf();
     init_textures(*renderer,ressources);
+}
+
+void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world){
+    int i;
+    for(i=0;i<world->life;i++){
+        apply_texture(ressources->coeur_plein,renderer,0,SCREEN_HEIGHT/4+i*20);
+    }
+    for(i=world->life;i<3;i++){
+        apply_texture(ressources->coeur_vide,renderer,0,SCREEN_HEIGHT/4+i*20);
+    }
 }

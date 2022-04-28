@@ -9,6 +9,14 @@
 
 /**
  * \brief Représentation pour stocker les ressources nécessaires à l'affichage graphique
+ * @param background la texture de fond du jeu
+ * @param skin_ship apparence du vaisseau
+ * @param skin_ennemy tableau de textures des ennemis
+ * @param missile apparence du missile
+ * @param font police utilisé pour afficher du texte
+ * @param menu_sprite logo du menu
+ * @param coeur_plein texture des coeurs plein
+ * @param coeur_vide  texture des coeurs vides
 */
 
 struct ressources_s
@@ -19,6 +27,8 @@ struct ressources_s
     SDL_Texture* missile; /*!<apparence du missile*/
     TTF_Font* font;  /*!< Police d'ecriture */
     SDL_Texture* menu_sprite;
+    SDL_Texture* coeur_plein;
+    SDL_Texture* coeur_vide;
 };
 
 typedef struct ressources_s ressources_t;
@@ -34,6 +44,7 @@ typedef struct ressources_s ressources_t;
  * @param w la largeur du sprite 
  * @param v la vitesse vertical du sprite 
  * @param is_visible le sprite doit-il être affiché ou non  
+ * @param is_apply le sprite doit-il être appliqué
  */
 
 struct sprite_s
@@ -60,6 +71,11 @@ typedef struct sprite_s sprite_t;
  * \param ship le vaisseau du joueur 
  * \param enemies le tableau de tous les ennemies
  * \param missile le sprite du missile
+ * \param gameover le programme est-il terminer
+ * \param nb_enemies_survived nombre d'ennemi ayant survécu
+ * \param state l'etat du programme
+ * \param nb_enemies_left nombre d'ennemi restant en jeu
+ * \param 
 */
 
 struct world_s

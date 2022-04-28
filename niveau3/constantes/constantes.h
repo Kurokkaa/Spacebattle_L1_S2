@@ -23,7 +23,7 @@
  * \brief Taille d'un vaisseau
  */
 
-#define SHIP_SIZE 32
+#define SHIP_SIZE 30
 
 
 /**
@@ -42,12 +42,12 @@
 /**
  * @brief nombres d'ennemie
  */
-#define NB_ENEMIES 20
+#define NB_ENEMIES 10
 /**
  * @brief distance vertical entre deux ennemies
  * 
  */
-#define VERTICAL_DIST (2*SHIP_SIZE)
+#define VERTICAL_DIST (4*SHIP_SIZE)
 /**
  * @brief nombre d'itération à attendre avant de fermer le jeu
  * 
