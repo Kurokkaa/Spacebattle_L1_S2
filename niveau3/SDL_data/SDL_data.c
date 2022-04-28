@@ -116,12 +116,13 @@ void handle_ennemies(world_t* world){
     //si le vaisseau enemi est en dehors de l'ecran
     //il a survécu
     //et on le retire du jeu et on enleve une vie au joueur
-    if(get_y(&(world->enemies[i]))>=SCREEN_HEIGHT){
+    if(get_y(&(world->enemies[i]))>=SCREEN_HEIGHT && world->enemies[i].is_apply){
         set_not_apply(&(world->enemies[i]));
         set_invisible(&(world->enemies[i]));
         world->nb_enemies_survived++;
         world->nb_enemies_left--;
         lose_life(world);
+        printf("%d",world->life);
     }
         }
     }
@@ -256,7 +257,7 @@ int sprites_collide(sprite_t *sp2, sprite_t *sp1){
     int distanceX = sp1->x - sp2->x;
     int distanceY = sp1->y - sp2->y;
     int distance  = sqrt(distanceX*distanceX + distanceY*distanceY);
-    return (distance <= sp1->w + sp2->w); 
+    return (distance <= sp1->w/2 + sp2->w/2); 
 }
 /**
  * @brief efface les sprites en cas de collision
@@ -273,7 +274,6 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
         sp2->is_apply=0;
         world->nb_enemies_left--;
         world->score++;
-        printf("%d",world->nb_enemies_left);
     }
 }
 /**
@@ -318,7 +318,7 @@ void update_ennemies(world_t* world){
  * @param world
  */
 void lose_life(world_t* world){
-    world->life=-1;
+    world->life=world->life-1;
 }
 /**
  * @brief change l'état de la partie en fonction de la situation
@@ -335,7 +335,8 @@ void compute_game(world_t* world){
             //si on enfin de partie le compte à rebours progresse
             world->timer_end++;
             }
-        else if(world->life==0){
+        else{
+        if(world->life==0){
             //la partie est perdu
                 world->score=0;
                 world->state=perdu;
@@ -361,7 +362,7 @@ void compute_game(world_t* world){
                 world->state=fin;   
                 }
             }
-            
+            }
         }
      }
 }

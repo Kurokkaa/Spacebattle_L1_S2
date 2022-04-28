@@ -42,7 +42,7 @@
 /**
  * @brief nombres d'ennemie
  */
-#define NB_ENEMIES 3
+#define NB_ENEMIES 20
 /**
  * @brief distance vertical entre deux ennemies
  * 
