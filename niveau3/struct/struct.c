@@ -147,3 +147,4 @@ void set_w(sprite_t* sprite,int w){
 void set_v(sprite_t* sprite,int v ){
     sprite->v=v;
     }
+

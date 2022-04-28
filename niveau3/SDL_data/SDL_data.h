@@ -57,5 +57,5 @@ void handle_ennemies(world_t* world);
 void compute_game(world_t* world);
 void move_missile(world_t* world);
 int generate_number(int a, int b);
-
+void lose_life(world_t* world);
 #endif

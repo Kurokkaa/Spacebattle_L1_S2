@@ -29,6 +29,7 @@ void init_data(world_t * world){
     world->score=0;
     world->state=menu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
+    world->life=3;
 }
 
 
@@ -112,14 +113,15 @@ void handle_ennemies(world_t* world){
                     handle_sprites_collision(&(world->missile),&(world->enemies[i]),world);
                 }
             }
-    //si le vaisseau est en dehors de l'ecran
+    //si le vaisseau enemi est en dehors de l'ecran
     //il a survécu
-    //et on le retire du jeu 
+    //et on le retire du jeu et on enleve une vie au joueur
     if(get_y(&(world->enemies[i]))>=SCREEN_HEIGHT){
         set_not_apply(&(world->enemies[i]));
         set_invisible(&(world->enemies[i]));
         world->nb_enemies_survived++;
         world->nb_enemies_left--;
+        lose_life(world);
     }
         }
     }
@@ -311,6 +313,14 @@ void update_ennemies(world_t* world){
     }
 }
 /**
+ * @brief compteur du nombre de vies
+ *
+ * @param world
+ */
+void lose_life(world_t* world){
+    world->life=-1;
+}
+/**
  * @brief change l'état de la partie en fonction de la situation
  * 
  * @param world 
@@ -325,7 +335,11 @@ void compute_game(world_t* world){
             //si on enfin de partie le compte à rebours progresse
             world->timer_end++;
             }
-
+        else if(world->life==0){
+            //la partie est perdu
+                world->score=0;
+                world->state=perdu;
+        }
         else{
             //si le vaisseau à été détruit
             if(world->ship.is_apply==0){    
