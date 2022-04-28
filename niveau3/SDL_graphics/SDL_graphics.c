@@ -37,7 +37,7 @@ void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
  * @param renderer le renderer
  * @param ressources les ressources
  */
-void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
+void init_textures(SDL_Renderer *renderer, ressources_t *ressources){
     ressources->background = load_image( "ressources/space-background.bmp",renderer);
     
     ressources->skin_ship = load_image("ressources/spaceship.bmp",renderer);
@@ -49,6 +49,10 @@ void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
     ressources->font  = load_font("ressources/arial.ttf",14);
 
     ressources->menu_sprite = load_image("ressources/spacebattle.bmp",renderer);
+
+    ressources->coeur_plein = load_image("ressources/coeur_plein.bmp",renderer);
+    
+    ressources->coeur_vide = load_image("ressources/coeur_vide.bmp",renderer);
 }
 /**
 * \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
@@ -58,7 +62,7 @@ void  init_textures(SDL_Renderer *renderer, ressources_t *ressources){
 * \param world le monde
 */
 void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
-    clean_data(world);
+    
     clean_textures(ressources);
     clean_sdl(renderer,window);
     clean_font(ressources->font);
@@ -78,12 +82,12 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
         dst.x = sprite->x; dst.y=sprite->y;
         SDL_RenderCopy(renderer, texture, NULL, &dst);
     }
-    else{
-        if(!(sprite->is_apply)){ //s'il ne doit pas être appliqué on nettoie
+    //si le vaisseau n'est ni affiché ni appliqué la texture est nettoyé
+    else if(!(sprite->is_apply)){ //s'il ne doit pas être appliqué on nettoie
         clean_texture(texture);
     }
 }
-}
+
 /**
  * @brief met à jour le renderer
  * 
@@ -92,15 +96,18 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
  * @param ressources les ressources
  */
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources){
-    char number[15];
+    //tableau qui accueillera le score
+    char number[15]; 
     //on vide le renderer
     clear_renderer(renderer);
     apply_background(renderer,ressources);
     //le score est transformé en chaine de caractéres
     sprintf(number,"%d",world->score);
+    
+    //on change l'affichage selon l'etat du jeu
     switch (world->state)  
     {
-    case jeu:
+    case jeu: 
         apply_sprite(renderer,ressources->skin_ship,&(world->ship));
         apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
         if(world->missile.is_apply){
@@ -108,6 +115,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
          }
         apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
+        display_life(renderer,ressources,world);
         break;
     case gagnant:
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",ressources->font);
@@ -116,10 +124,12 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         break;
     case perdu:
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",ressources->font);
+        apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case fin:
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"Game Over ! ",ressources->font);
+        apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case menu:
@@ -154,3 +164,27 @@ void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t spri
     }
 }
 
+/**
+ * @brief initialise les différents module
+ * 
+ * @param window 
+ * @param renderer 
+ * @param ressources 
+ * @param world 
+ */
+void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world){
+    init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_data(world);
+    init_ttf();
+    init_textures(*renderer,ressources);
+}
+
+void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world){
+    int i;
+    for(i=0;i<world->life;i++){
+        apply_texture(ressources->coeur_plein,renderer,0,SCREEN_HEIGHT/4+i*20);
+    }
+    for(i=world->life;i<3;i++){
+        apply_texture(ressources->coeur_vide,renderer,0,SCREEN_HEIGHT/4+i*20);
+    }
+}

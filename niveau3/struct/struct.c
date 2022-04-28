@@ -86,10 +86,19 @@ void set_visible(sprite_t* sprite){
 void set_invisible(sprite_t* sprite){
     sprite->is_visible=0;
 }
-
+/**
+ * @brief rend le sprite applicable
+ * 
+ * @param sprite 
+ */
 void set_apply(sprite_t* sprite){
     sprite->is_apply = 1;
 }
+/**
+ * @brief rend le sprite inapplicable
+ * 
+ * @param sprite 
+ */
 void set_not_apply(sprite_t* sprite){
     sprite->is_apply = 0;
 }
@@ -138,3 +147,4 @@ void set_w(sprite_t* sprite,int w){
 void set_v(sprite_t* sprite,int v ){
     sprite->v=v;
     }
+
