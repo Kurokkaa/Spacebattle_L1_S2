@@ -15,7 +15,7 @@ struct ressources_s
 {
     SDL_Texture* background; /*!< Texture liée à l'image du fond de l'écran. */
     SDL_Texture* skin_ship; /*!< apparence du vaisseau*/
-    SDL_Texture* skin_ennemy[NB_ENEMIES]; /*!< apparende de l'ennemi*/
+    SDL_Texture* skin_ennemy[NB_ENEMIES]; /*!< apparence de l'ennemi*/
     SDL_Texture* missile; /*!<apparence du missile*/
     TTF_Font* font;  /*!< Police d'ecriture */
     SDL_Texture* menu_sprite;
