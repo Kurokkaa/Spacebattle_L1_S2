@@ -58,4 +58,6 @@ void compute_game(world_t* world);
 void move_missile(world_t* world);
 int generate_number(int a, int b);
 void lose_life(world_t* world);
+int CheckState(world_t* world);
+int CheckLife(world_t* world);
 #endif

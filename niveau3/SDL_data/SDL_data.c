@@ -266,6 +266,7 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
         sp2->is_apply=0;
         world->nb_enemies_left--;
         world->score++;
+        
     }
 }
 /**
@@ -313,38 +314,65 @@ void lose_life(world_t* world){
     world->life-=1;
 }
 /**
+ * @brief retourne 1 si l'etat = perdu,gagnant ou fin
+ * 
+ * @param world 
+ */
+int CheckState(world_t* world){
+    return world->state==perdu || world->state==gagnant || world->state==fin;
+}
+/**
+ * @brief returne 1 si le nombre de vie égal à 0 sinon 0
+ * 
+ * @param world 
+ * @return int 
+ */
+int CheckLife(world_t* world){
+    return world->life==0;
+}
+/**
+ * @brief retourne si le nombre d'ennemi restant = 0
+ * 
+ * @param world 
+ * @return int 
+ */
+int CheckEnemiesLeft(world_t* world){
+    return world->nb_enemies_left==0;
+}
+
+/**
+ * @brief retourne si le nombre d'ennemi qui à survie = 0
+ * 
+ * @param world 
+ * @return int 
+ */
+int CheckEnemiesSurvived(world_t* world){
+    return world->nb_enemies_survived==0;
+}
+/**
  * @brief change l'état de la partie en fonction de la situation
  * 
  * @param world 
  */
 void compute_game(world_t* world){
     if(world->timer_end==TIME_ENDING){
-            world->gameover=1;
-            
+            world->gameover=1;    
         }
-    else{   
-        if(world->state==perdu || world->state==gagnant || world->state==fin){
-            //si on enfin de partie le compte à rebours progresse
+    else if(CheckState(world)){   
+            //si on est en fin de partie le compte à rebours progresse
             world->timer_end++;
-            }
-        else{
-        if(world->life==0){
+    }
+    else{
+        if(CheckLife(world)||!get_is_apply(&(world->ship))){
             //la partie est perdu
                 world->score=0;
                 world->state=perdu;
         }
-        else{
-            //si le vaisseau à été détruit
-            if(world->ship.is_apply==0){    
-                //la partie est perdu
-                world->score=0;
-                world->state=perdu;
-            }
-            //sinon si tous les ennemis sont mort ou a survécu
-            else if(world->nb_enemies_left==0){
+        //sinon si tous les ennemis sont mort ou a survécu
+        else if(CheckEnemiesLeft(world)){
             //on regarde combien d'ennemi ont survécu
             //s'ils ont eté tous détruit
-            if(world->nb_enemies_survived==0){
+            if(CheckEnemiesSurvived(world)){
                 //le joueur a gagné
                 world->state=gagnant;
                 world->score*=2;
@@ -353,8 +381,8 @@ void compute_game(world_t* world){
             else{
                 world->state=fin;   
                 }
-            }
-            }
         }
-     }
+    }
 }
+
+

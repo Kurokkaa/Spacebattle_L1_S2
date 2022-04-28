@@ -75,7 +75,9 @@ typedef struct sprite_s sprite_t;
  * \param nb_enemies_survived nombre d'ennemi ayant survécu
  * \param state l'etat du programme
  * \param nb_enemies_left nombre d'ennemi restant en jeu
- * \param 
+ * \param score score du joueur
+ * \param timer_end timer de fermeture de la fenêtre
+ * \param life nombre de vie du vaisseau
 */
 
 struct world_s

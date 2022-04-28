@@ -26,4 +26,5 @@ void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t spri
 void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world);
 void init_textures(SDL_Renderer *renderer, ressources_t *ressources);
 void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources);
+void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world);
 #endif
