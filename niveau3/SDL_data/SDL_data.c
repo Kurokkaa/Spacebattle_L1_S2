@@ -27,9 +27,10 @@ void init_data(world_t * world){
     world->nb_enemies_left=NB_ENEMIES; //il reste tous les ennemies au début
     world->nb_enemies_survived=0;      
     world->score=0;
-    world->state=jeu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
+    world->state=menu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
     world->life=3;
+    world->x_logo=0;
 }
 
 
@@ -72,7 +73,13 @@ void replace_missile(world_t* world){
  * \param les données du monde
  */
 void update_data(world_t *world){
-    
+    if(world->state==menu){
+        
+        if(world->x_logo>=SCREEN_HEIGHT/5){
+            world->x_logo=SCREEN_HEIGHT/5;
+        }
+        else world->x_logo+=3;
+    }
     if(world->state==jeu || world->state==perdu || world->state==gagnant || world->state==fin){
     compute_game(world);
     }

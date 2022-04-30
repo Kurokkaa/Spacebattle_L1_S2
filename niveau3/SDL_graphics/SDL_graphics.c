@@ -133,7 +133,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case menu:
-        apply_texture(ressources->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/5);
+        apply_texture(ressources->menu_sprite,renderer,world->x_logo-SCREEN_WIDTH/4,SCREEN_HEIGHT/5);
         apply_text(renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/5+100,SCREEN_WIDTH/3,50,"PRESS SPACE TO START ",ressources->font);
         break;
     }    
