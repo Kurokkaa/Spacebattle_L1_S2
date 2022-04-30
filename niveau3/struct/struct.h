@@ -92,6 +92,7 @@ struct world_s
     int score;
     int timer_end;
     int life;
+    int menu_courant;
 };
 
 typedef struct world_s world_t;

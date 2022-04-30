@@ -53,6 +53,11 @@
  * 
  */
 #define TIME_ENDING 270
+
+/**
+ * @brief nombre de vies du vaisseau
+ */
+#define LIFE_NUMBER 3
 /**
  * @brief énumeration afin de gérer les différents états du jeu
  * 

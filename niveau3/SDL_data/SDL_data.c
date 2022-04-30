@@ -27,9 +27,10 @@ void init_data(world_t * world){
     world->nb_enemies_left=NB_ENEMIES; //il reste tous les ennemies au début
     world->nb_enemies_survived=0;      
     world->score=0;
-    world->state=jeu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
+    world->state=menu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
-    world->life=3;
+    world->life=LIFE_NUMBER;
+    world->menu_courant=0;
 }
 
 
@@ -72,9 +73,9 @@ void replace_missile(world_t* world){
  * \param les données du monde
  */
 void update_data(world_t *world){
-    
+  
     if(world->state==jeu || world->state==perdu || world->state==gagnant || world->state==fin){
-    compute_game(world);
+        compute_game(world);
     }
     if(world->state==jeu){
     replace_missile(world);
@@ -82,10 +83,8 @@ void update_data(world_t *world){
     left_limit(&(world->ship));
     right_limit(&(world->ship));
     update_ennemies(world);
-    handle_ennemies(world);
-    
-    }
-    
+    handle_ennemies(world);  
+    }  
 }
 
 /**
@@ -155,10 +154,31 @@ void handle_events(SDL_Event *event,world_t *world){
                 switch (world->state) //selon l'état du jeu les touches ne font pas la même action
                 {
                 case menu:
-                    switch (event->key.keysym.sym)
-                    {
-                        case SDLK_SPACE:
-                            world->state=jeu; //le jeu est lancé
+                    switch (event->key.keysym.sym){
+                        case SDLK_RETURN:
+                            switch (world->menu_courant)
+                            {
+                            case 0:
+                                world->state=jeu;
+                                break;
+                            
+                            case 2:
+                                world->gameover=1;
+                            }
+                            break;
+                        case SDLK_UP:
+                            world->menu_courant++;
+                            if(world->menu_courant>2){
+                                world->menu_courant=0;
+                            }
+                            break;
+                        case SDLK_DOWN:
+                            if(world->menu_courant==0){
+                                world->menu_courant=2;
+                            }
+                            else{
+                                world->menu_courant--;
+                            }
                             break;
                         case SDLK_ESCAPE:
                             world->gameover=1;

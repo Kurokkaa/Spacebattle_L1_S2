@@ -133,14 +133,35 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case menu:
-        apply_texture(ressources->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/5);
-        apply_text(renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/5+100,SCREEN_WIDTH/3,50,"PRESS SPACE TO START ",ressources->font);
+        apply_texture(ressources->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/4);
+        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,60,"Jouer",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+50,SCREEN_WIDTH/3,60,"Highscore",ressources->font);
+        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+100,SCREEN_WIDTH/3,60,"Quitter",ressources->font);
+        display_selection_zone(SCREEN_WIDTH/4,SCREEN_HEIGHT/2+world->menu_courant*50,SCREEN_WIDTH/2+10,50,renderer);
         break;
     }    
     // on met à jour l'écran
     update_screen(renderer);
 }
+void display_selection_zone(int x, int y, int w, int h,SDL_Renderer *renderer){
+    SDL_Rect r1;
+    SDL_Rect r2;
+    SDL_Rect r3;
+    SDL_Rect r4;
+    r1.x = x;   r1.y = y;   r1.w = w;   r1.h = 5;
+    r2.x = x;   r2.y = y+5; r2.h = h;   r2.w = 5;   
+    r3.x = x+w; r3.y = y;   r3.w = 5;   r3.h = h+5;
+    r4.x = x;   r4.y = y+h; r4.w = w;   r4.h = 5;
 
+    // Set render color to blue ( rect will be rendered in this color )
+    SDL_SetRenderDrawColor(renderer, 228, 226,226 ,255);
+
+    // Render rect
+    SDL_RenderFillRect(renderer, &r1 );
+    SDL_RenderFillRect(renderer, &r2 );
+    SDL_RenderFillRect(renderer, &r3 );
+    SDL_RenderFillRect(renderer, &r4 );
+}
 /**
  * \brief La fonction applique la texture du fond sur le renderer lié à l'écran de jeu
  * \param renderer le renderer
@@ -184,7 +205,7 @@ void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world
     for(i=0;i<world->life;i++){
         apply_texture(ressources->coeur_plein,renderer,0,SCREEN_HEIGHT/4+i*20);
     }
-    for(i=world->life;i<3;i++){
+    for(i=world->life;i<LIFE_NUMBER;i++){
         apply_texture(ressources->coeur_vide,renderer,0,SCREEN_HEIGHT/4+i*20);
     }
 }
