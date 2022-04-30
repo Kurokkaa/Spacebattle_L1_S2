@@ -8,65 +8,7 @@
 #include "SDL_graphics.h"
 
 
-/**
- * \brief La fonction nettoie les textures
- * \param ressources les ressources
-*/
-void clean_textures(ressources_t *ressources){
-    clean_texture(ressources->background);
-    clean_texture(ressources->skin_ship);
-    clean_texture(ressources->skin_ennemy);
-    clean_texture(ressources->missile);
-}
-/**
- * @brief 
- * 
- * @param renderer le renderer
- * @param ressources les ressources
- */
-void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
-    for(int i = 0;i<NB_ENEMIES;i++){
-        ressources->skin_ennemy[i]=load_image("ressources/enemy.bmp",renderer);
-    }
-}
 
-
-/**
- * @brief charge les images liées au textures 
- * 
- * @param renderer le renderer
- * @param ressources les ressources
- */
-void init_textures(SDL_Renderer *renderer, ressources_t *ressources){
-    ressources->background = load_image( "ressources/space-background.bmp",renderer);
-    
-    ressources->skin_ship = load_image("ressources/spaceship.bmp",renderer);
-
-    init_textures_enemies(renderer,ressources);
-
-    ressources->missile = load_image("ressources/missile.bmp", renderer);
-    
-    ressources->font  = load_font("ressources/arial.ttf",14);
-
-    ressources->menu_sprite = load_image("ressources/spacebattle.bmp",renderer);
-
-    ressources->coeur_plein = load_image("ressources/coeur_plein.bmp",renderer);
-    
-    ressources->coeur_vide = load_image("ressources/coeur_vide.bmp",renderer);
-}
-/**
-* \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
-* \param window la fenêtre du jeu
-* \param renderer le renderer
-* \param ressources les ressources
-* \param world le monde
-*/
-void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
-    
-    clean_textures(ressources);
-    clean_sdl(renderer,window);
-    clean_font(ressources->font);
-}
 /**
  * @brief affiche l'entité à la position enregistré dans les données du jeu
  * 
@@ -98,6 +40,7 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources){
     //tableau qui accueillera le score
     char number[15]; 
+    
     //on vide le renderer
     clear_renderer(renderer);
     apply_background(renderer,ressources);
@@ -116,6 +59,12 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         display_life(renderer,ressources,world);
+        
+        if(world->playable){
+        stop_music(0);
+        play_music(0,ressources->sound.game_theme,0);
+        world->playable=0;
+        }
         break;
     case gagnant:
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",ressources->font);
@@ -133,11 +82,15 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case menu:
-        apply_texture(ressources->menu_sprite,renderer,SCREEN_WIDTH/8,SCREEN_HEIGHT/4);
         apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,60,"Jouer",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+50,SCREEN_WIDTH/3,60,"Highscore",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+100,SCREEN_WIDTH/3,60,"Quitter",ressources->font);
-        display_selection_zone(SCREEN_WIDTH/4,SCREEN_HEIGHT/2+world->menu_courant*50,SCREEN_WIDTH/2+10,50,renderer);
+        display_selection_zone(SCREEN_WIDTH/3-10,SCREEN_HEIGHT/2+world->menu_courant*50,SCREEN_WIDTH/3+20,50,renderer);
+        apply_texture(ressources->menu_sprite,renderer,world->x_logo-SCREEN_WIDTH/4,SCREEN_HEIGHT/5);
+        if(world->playable && !Mix_Playing(0)){
+        play_music(0,ressources->sound.menu_theme,0);
+        
+        }
         break;
     }    
     // on met à jour l'écran
@@ -185,20 +138,7 @@ void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t spri
     }
 }
 
-/**
- * @brief initialise les différents module
- * 
- * @param window 
- * @param renderer 
- * @param ressources 
- * @param world 
- */
-void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world){
-    init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
-    init_data(world);
-    init_ttf();
-    init_textures(*renderer,ressources);
-}
+
 
 void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world){
     int i;

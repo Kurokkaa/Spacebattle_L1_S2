@@ -10,6 +10,7 @@
 #include "SDL_data.h"
 
 
+
 /**
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
@@ -31,6 +32,7 @@ void init_data(world_t * world){
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
     world->life=LIFE_NUMBER;
     world->menu_courant=0;
+    world->playable = 1;
 }
 
 
@@ -74,6 +76,13 @@ void replace_missile(world_t* world){
  */
 void update_data(world_t *world){
   
+    if(world->state==menu){
+        
+        if(world->x_logo>=SCREEN_HEIGHT/5){
+            world->x_logo=SCREEN_HEIGHT/5;
+        }
+        else world->x_logo+=3;
+    }
     if(world->state==jeu || world->state==perdu || world->state==gagnant || world->state==fin){
         compute_game(world);
     }
@@ -166,13 +175,13 @@ void handle_events(SDL_Event *event,world_t *world){
                                 world->gameover=1;
                             }
                             break;
-                        case SDLK_UP:
+                        case SDLK_DOWN:
                             world->menu_courant++;
                             if(world->menu_courant>2){
                                 world->menu_courant=0;
                             }
                             break;
-                        case SDLK_DOWN:
+                        case SDLK_UP:
                             if(world->menu_courant==0){
                                 world->menu_courant=2;
                             }
@@ -200,6 +209,7 @@ void handle_events(SDL_Event *event,world_t *world){
                     case SDLK_SPACE:
                         if(get_is_visible(&(world->ship))){ // on peut tirer seulement si le vaisseau est visible
                             set_visible(&(world->missile));
+                            play_music(1,)
                         }
                         break;
                     case SDLK_ESCAPE:
@@ -405,4 +415,141 @@ void compute_game(world_t* world){
     }
 }
 
-
+/**
+ * @brief retourne la valeur de is_apply
+ * 
+ * @param sprite 
+ * @return int la valeur d'is_apply
+ */
+int get_is_apply(sprite_t* sprite){
+    return sprite->is_apply;
+}
+/**
+ * @brief retourne la valeur de is_invisible
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_is_visible(sprite_t* sprite){
+    return sprite->is_visible;
+    }
+/**
+ * @brief retourne la valeur de x 
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_x(sprite_t* sprite){
+    return sprite->x;
+}
+/**
+ * @brief retourne la valeur de y
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_y(sprite_t* sprite){
+    return sprite->y;
+}
+/**
+ * @brief retourne la valeur de h
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_h(sprite_t* sprite){
+    return sprite->h;
+}
+/**
+ * @brief retourne la valeur de v
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_v(sprite_t* sprite){
+    return sprite->v;
+}
+/**
+ * @brief retourne la valeur de w
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_w(sprite_t* sprite){
+    return sprite->w;
+}
+/**
+ * @brief met is_visible à 1
+ * @param sprite 
+ */
+void set_visible(sprite_t* sprite){
+    sprite->is_visible=1;
+}
+/**
+ * @brief met is_visible à 0
+ * 
+ */
+void set_invisible(sprite_t* sprite){
+    sprite->is_visible=0;
+}
+/**
+ * @brief rend le sprite applicable
+ * 
+ * @param sprite 
+ */
+void set_apply(sprite_t* sprite){
+    sprite->is_apply = 1;
+}
+/**
+ * @brief rend le sprite inapplicable
+ * 
+ * @param sprite 
+ */
+void set_not_apply(sprite_t* sprite){
+    sprite->is_apply = 0;
+}
+/**
+ * @brief change la valeur de x
+ * 
+ * @param sprite 
+ * @param x 
+ */
+void set_x(sprite_t* sprite,int x){
+    sprite->x=x;
+}
+/**
+ * @brief change la valeur de y
+ * 
+ * @param sprite 
+ * @param y
+ */
+void set_y(sprite_t* sprite,int y){
+    sprite->y=y;
+}
+/**
+ * @brief change la valeur de h
+ * 
+ * @param sprite 
+ * @param h
+ */
+void set_h(sprite_t* sprite,int h){
+    sprite->h=h;
+}
+/**
+ * @brief change la valeur de w
+ * 
+ * @param sprite 
+ * @param w 
+ */
+void set_w(sprite_t* sprite,int w){
+    sprite->w=w;
+}
+/**
+ * @brief change la valeur de v
+ * 
+ * @param sprite 
+ * @param v
+ */
+void set_v(sprite_t* sprite,int v ){
+    sprite->v=v;
+    }
