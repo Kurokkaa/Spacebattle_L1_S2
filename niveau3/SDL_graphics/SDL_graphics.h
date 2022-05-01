@@ -50,4 +50,5 @@ void apply_background(SDL_Renderer *renderer, ressources_t *ressources);
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite);
 void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t sprite[]);
 void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world);
+void display_selection_zone(int x, int y, int w, int h,SDL_Renderer *renderer);
 #endif

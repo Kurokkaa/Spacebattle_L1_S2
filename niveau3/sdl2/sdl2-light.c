@@ -23,7 +23,7 @@
 
 int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height)
 {
-    if(0 != SDL_Init(SDL_INIT_EVERYTHING))
+    if(0 != SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
     {
         fprintf(stderr, "Erreur initialisation de la SDL : %s", SDL_GetError());
         return -1;

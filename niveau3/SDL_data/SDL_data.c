@@ -17,12 +17,13 @@
  */
 
 void init_data(world_t * world){
-                    /*----------------------------------initialisation des sprites--------------------------------*/
-    init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
+                /*----------------------------------initialisation des sprites--------------------------------*/
+    init_ennemies(world);
+    
+   
     init_sprite(&(world->missile),SCREEN_WIDTH/2-MISSILE_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2+MISSILE_SIZE-SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, MISSILE_SPEED);
     set_invisible(&(world->missile));
-    init_ennemies(world);
-                    /*---------------------------------------------------------------------------------------------*/
+             /*---------------------------------------------------------------------------------------------*/
     //on n'est pas à la fin du jeu
     world->gameover = 0;   
     world->nb_enemies_left=NB_ENEMIES; //il reste tous les ennemies au début
@@ -33,6 +34,10 @@ void init_data(world_t * world){
     world->life=LIFE_NUMBER;
     world->menu_courant=0;
     world->playable = 1;
+    init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
+    printf("%d",world->ship.is_apply);
+    printf("%d",world->ship.is_visible);
+    printf("%d",world->score);
 }
 
 
@@ -75,25 +80,44 @@ void replace_missile(world_t* world){
  * \param les données du monde
  */
 void update_data(world_t *world){
-  
-    if(world->state==menu){
-        
+    switch (world->state)
+    {
+    case menu:
         if(world->x_logo>=SCREEN_HEIGHT/5){
             world->x_logo=SCREEN_HEIGHT/5;
         }
         else world->x_logo+=3;
-    }
-    if(world->state==jeu || world->state==perdu || world->state==gagnant || world->state==fin){
+        break;
+    case jeu:
+        replace_missile(world);
+        move_missile(world);
+        left_limit(&(world->ship));
+        right_limit(&(world->ship));
+        update_ennemies(world);
+        handle_ennemies(world);  
         compute_game(world);
+        break;
+    case perdu:
+        compute_game(world);
+        break;
+    case gagnant:
+        compute_game(world);
+        break;
+    case fin:
+        compute_game(world);
+        break;
+    default:
+        break;
     }
-    if(world->state==jeu){
-    replace_missile(world);
-    move_missile(world);
-    left_limit(&(world->ship));
-    right_limit(&(world->ship));
-    update_ennemies(world);
-    handle_ennemies(world);  
-    }  
+    if(world->state==menu){
+        
+    }
+    else{
+    
+    }
+
+    
+
 }
 
 /**
@@ -122,7 +146,7 @@ void handle_ennemies(world_t* world){
         world->nb_enemies_survived++;
         world->nb_enemies_left--;
         lose_life(world);
-        printf("%d",world->life);
+
     }
         }
     }
@@ -209,7 +233,6 @@ void handle_events(SDL_Event *event,world_t *world){
                     case SDLK_SPACE:
                         if(get_is_visible(&(world->ship))){ // on peut tirer seulement si le vaisseau est visible
                             set_visible(&(world->missile));
-                            play_music(1,)
                         }
                         break;
                     case SDLK_ESCAPE:
@@ -231,13 +254,14 @@ void handle_events(SDL_Event *event,world_t *world){
  * @param v vitesse verticale
  */
 void init_sprite(sprite_t *sprite, int x, int y, int w, int h, int v){
+    sprite->is_apply=1;
+    sprite->is_visible=1;
     set_x(sprite,x);
     set_y(sprite,y);
     set_w(sprite,w);
     set_h(sprite,h);
     set_v(sprite,v);
-    set_visible(sprite);
-    set_apply(sprite);  
+     
 }
 /**
  * @brief la fonction bloque le vaisseau sur la gauche pour qu'il ne sorte pas de l'écran
@@ -318,9 +342,10 @@ void init_ennemies(world_t* world){
     int i;
     int x;
     int y;
+    world->enemies=(sprite_t*)malloc(sizeof(sprite_t)*NB_ENEMIES); 
     for(i=0;i<NB_ENEMIES;i++){
         x = generate_number(0,SCREEN_WIDTH-SHIP_SIZE);
-        y = -SHIP_SIZE/2 - i* VERTICAL_DIST;
+        y = -(SHIP_SIZE + i* VERTICAL_DIST);
         init_sprite(&(world->enemies[i]),x,y,SHIP_SIZE,SHIP_SIZE,ENEMY_SPEED);
     }
 }
@@ -385,6 +410,7 @@ int CheckEnemiesSurvived(world_t* world){
  * @param world 
  */
 void compute_game(world_t* world){
+  
     if(world->timer_end==TIME_ENDING){
             world->gameover=1;    
         }
@@ -393,13 +419,13 @@ void compute_game(world_t* world){
             world->timer_end++;
     }
     else{
-        if(CheckLife(world)||!get_is_apply(&(world->ship))){
+        if(CheckLife(world)||!get_is_visible(&(world->ship))){
             //la partie est perdu
                 world->score=0;
                 world->state=perdu;
         }
         //sinon si tous les ennemis sont mort ou a survécu
-        else if(CheckEnemiesLeft(world)){
+         if(CheckEnemiesLeft(world)){
             //on regarde combien d'ennemi ont survécu
             //s'ils ont eté tous détruit
             if(CheckEnemiesSurvived(world)){

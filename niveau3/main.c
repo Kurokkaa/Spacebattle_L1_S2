@@ -10,7 +10,14 @@
 #include "SDL_data/SDL_data.h"
 #include "SDL_graphics/SDL_graphics.h"
 #include "sdl2/sdl2-ttf-light.h"
-
+void clean_texture_textures_enemies(SDL_Texture** texture){
+    int i;
+    for(i=0;i<NB_ENEMIES;i++){
+        if(NULL != texture[i]){
+        SDL_DestroyTexture(texture[i]);
+    }
+    }
+}
 /**
  * \brief La fonction nettoie les textures
  * \param ressources les ressources
@@ -18,10 +25,11 @@
 void clean_ressources(ressources_t *ressources){
     clean_texture(ressources->background);
     clean_texture(ressources->skin_ship);
-    clean_texture(ressources->skin_ennemy);
     clean_texture(ressources->missile);
+    clean_texture_textures_enemies(ressources->skin_ennemy);
     clean_audio(&(ressources->sound));
     clean_font(ressources->font);
+    
 }
 /**
  * @brief 
@@ -69,7 +77,6 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 * \param world le monde
 */
 void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
-    
     clean_ressources(ressources);
     clean_sdl(renderer,window);
     
@@ -85,8 +92,8 @@ void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources
  * @param world 
  */
 void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world){
-    init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
     init_data(world);
+    init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
     init_ttf();
     init_audio();
     init_ressources(*renderer,ressources);
@@ -109,12 +116,13 @@ int WinMain( int argc, char* args[] )
     
     //initialisation du jeu
     init(&window,&renderer,&ressources,&world);
-    
-
+   
     while(!is_game_over(&world)){ //tant que le jeu n'est pas fini
        //mise à jour des données liée à la physique du monde
         update_data(&world);
- 
+        world.ship.is_apply=1;
+        world.ship.is_visible=1;
+
         //gestion des évènements
         handle_events(&event,&world);
         

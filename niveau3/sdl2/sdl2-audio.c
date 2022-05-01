@@ -4,17 +4,13 @@
 
 void init_audio(){
     
-    if (Mix_OpenAudio(96000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) < 0)
-    {   printf("Erreur d'initialisation %s",Mix_GetError());
-        SDL_Quit();
-    }   
-    else{
-        printf("initialisation audio reussi \n");
-    }
-    channel_allocation(3);
-    Mix_Volume(0,10);
+   Mix_OpenAudio(20000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 5096);
+    
+     channel_allocation(3);
+    Mix_Volume(0,100);
     Mix_Volume(1,100);
     Mix_Volume(2,100);
+   
     
 }
 void clean_audio(audio_t* sound){
@@ -44,7 +40,7 @@ void init_music(audio_t* sound){
 
 void play_music(int channel,Mix_Chunk* music,int times){
 
-    printf("%d",Mix_PlayChannel(channel,music,times));
+    Mix_PlayChannel(channel,music,times);
 }
 void channel_allocation(int nb_channels){
     Mix_AllocateChannels(nb_channels);

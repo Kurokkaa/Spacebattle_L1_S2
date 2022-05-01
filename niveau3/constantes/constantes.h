@@ -40,9 +40,9 @@
  */
 #define MISSILE_SPEED 5
 /**
- * @brief nombres d'ennemie
+ * @brief nombres d'ennemies
  */
-#define NB_ENEMIES 100
+#define NB_ENEMIES 400
 /**
  * @brief distance vertical entre deux ennemies
  * 

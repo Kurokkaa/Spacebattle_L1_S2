@@ -63,7 +63,7 @@ typedef struct sprite_s sprite_t;
 struct world_s
 {
     sprite_t ship; /*!<sprite du vaisseau du joueur*/
-    sprite_t enemies[NB_ENEMIES]; /*!<tableau de sprite_t représentant les ennemies*/
+    sprite_t* enemies; /*!<tableau de sprite_t représentant les ennemies*/
     sprite_t missile; /*<sprite du missile*.*/
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     int nb_enemies_survived; /*!< nombre d'ennemis survécu*/

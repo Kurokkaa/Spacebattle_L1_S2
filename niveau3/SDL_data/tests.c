@@ -1,5 +1,4 @@
 #include "SDL_data.h"
-#include "../struct/struct.h"
 #include "../constantes/constantes.h"
 
 

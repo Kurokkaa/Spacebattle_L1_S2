@@ -72,6 +72,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,SCREEN_WIDTH/3 + SCREEN_WIDTH/6 ,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case perdu:
+        
         apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",ressources->font);
         apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
@@ -89,8 +90,9 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_texture(ressources->menu_sprite,renderer,world->x_logo-SCREEN_WIDTH/4,SCREEN_HEIGHT/5);
         if(world->playable && !Mix_Playing(0)){
         play_music(0,ressources->sound.menu_theme,0);
-        
         }
+        break;
+    default:
         break;
     }    
     // on met à jour l'écran
