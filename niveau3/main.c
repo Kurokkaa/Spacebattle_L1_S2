@@ -67,6 +67,8 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
     
     ressources->coeur_vide = load_image("ressources/coeur_vide.bmp",renderer);
 
+    ressources->solo_menu = load_image("ressources/solo.bmp",renderer);
+
     init_music(&(ressources->sound));
 }
 /**

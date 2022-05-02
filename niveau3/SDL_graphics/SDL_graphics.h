@@ -41,6 +41,7 @@ struct ressources_s
     SDL_Texture* coeur_plein;
     SDL_Texture* coeur_vide;
     audio_t sound;
+    SDL_Texture* solo_menu;
 };
 
 typedef struct ressources_s ressources_t;
