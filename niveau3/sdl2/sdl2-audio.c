@@ -4,7 +4,7 @@
 
 void init_audio(){
     
-   Mix_OpenAudio(20000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 5096);
+   Mix_OpenAudio(12000, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 10192);
     
      channel_allocation(3);
     Mix_Volume(0,100);

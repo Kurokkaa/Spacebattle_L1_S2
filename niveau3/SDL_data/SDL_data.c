@@ -10,26 +10,34 @@
 #include "SDL_data.h"
 
 
+
 /**
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
  */
 
 void init_data(world_t * world){
-                    /*----------------------------------initialisation des sprites--------------------------------*/
-    init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
+                /*----------------------------------initialisation des sprites--------------------------------*/
+    init_ennemies(world);
+    
+   
     init_sprite(&(world->missile),SCREEN_WIDTH/2-MISSILE_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2+MISSILE_SIZE-SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, MISSILE_SPEED);
     set_invisible(&(world->missile));
-    init_ennemies(world);
-                    /*---------------------------------------------------------------------------------------------*/
+             /*---------------------------------------------------------------------------------------------*/
     //on n'est pas à la fin du jeu
     world->gameover = 0;   
     world->nb_enemies_left=NB_ENEMIES; //il reste tous les ennemies au début
     world->nb_enemies_survived=0;      
     world->score=0;
-    world->state=jeu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
+    world->state=menu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
-    world->life=3;
+    world->life=LIFE_NUMBER;
+    world->menu_courant=0;
+    world->playable = 1;
+    init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
+    printf("%d",world->ship.is_apply);
+    printf("%d",world->ship.is_visible);
+    printf("%d",world->score);
 }
 
 
@@ -72,20 +80,44 @@ void replace_missile(world_t* world){
  * \param les données du monde
  */
 void update_data(world_t *world){
-    
-    if(world->state==jeu || world->state==perdu || world->state==gagnant || world->state==fin){
-    compute_game(world);
+    switch (world->state)
+    {
+    case menu:
+        if(world->x_logo>=SCREEN_HEIGHT/5){
+            world->x_logo=SCREEN_HEIGHT/5;
+        }
+        else world->x_logo+=3;
+        break;
+    case jeu:
+        replace_missile(world);
+        move_missile(world);
+        left_limit(&(world->ship));
+        right_limit(&(world->ship));
+        update_ennemies(world);
+        handle_ennemies(world);  
+        compute_game(world);
+        break;
+    case perdu:
+        compute_game(world);
+        break;
+    case gagnant:
+        compute_game(world);
+        break;
+    case fin:
+        compute_game(world);
+        break;
+    default:
+        break;
     }
-    if(world->state==jeu){
-    replace_missile(world);
-    move_missile(world);
-    left_limit(&(world->ship));
-    right_limit(&(world->ship));
-    update_ennemies(world);
-    handle_ennemies(world);
+    if(world->state==menu){
+        
+    }
+    else{
     
     }
+
     
+
 }
 
 /**
@@ -113,8 +145,8 @@ void handle_ennemies(world_t* world){
         set_invisible(&(world->enemies[i]));
         world->nb_enemies_survived++;
         world->nb_enemies_left--;
-       // lose_life(world);
-        printf("%d",world->life);
+        lose_life(world);
+
     }
         }
     }
@@ -155,10 +187,44 @@ void handle_events(SDL_Event *event,world_t *world){
                 switch (world->state) //selon l'état du jeu les touches ne font pas la même action
                 {
                 case menu:
-                    switch (event->key.keysym.sym)
-                    {
-                        case SDLK_SPACE:
-                            world->state=jeu; //le jeu est lancé
+                    switch (event->key.keysym.sym){
+                        case SDLK_RETURN:
+                            switch (world->menu_courant)
+                            {
+                            case 0:
+                                world->state=jeu;
+                                break;
+                            
+                            case 2:
+                                world->gameover=1;
+                                break;
+                            }
+                            break;
+                        case SDLK_KP_ENTER:
+                             switch (world->menu_courant)
+                            {
+                            case 0:
+                                world->state=jeu;
+                                break;
+                            
+                            case 2:
+                                world->gameover=1;
+                                break;
+                            }
+                            break;
+                        case SDLK_DOWN:
+                            world->menu_courant++;
+                            if(world->menu_courant>2){
+                                world->menu_courant=0;
+                            }
+                            break;
+                        case SDLK_UP:
+                            if(world->menu_courant==0){
+                                world->menu_courant=2;
+                            }
+                            else{
+                                world->menu_courant--;
+                            }
                             break;
                         case SDLK_ESCAPE:
                             world->gameover=1;
@@ -201,13 +267,14 @@ void handle_events(SDL_Event *event,world_t *world){
  * @param v vitesse verticale
  */
 void init_sprite(sprite_t *sprite, int x, int y, int w, int h, int v){
+    sprite->is_apply=1;
+    sprite->is_visible=1;
     set_x(sprite,x);
     set_y(sprite,y);
     set_w(sprite,w);
     set_h(sprite,h);
     set_v(sprite,v);
-    set_visible(sprite);
-    set_apply(sprite);  
+     
 }
 /**
  * @brief la fonction bloque le vaisseau sur la gauche pour qu'il ne sorte pas de l'écran
@@ -246,10 +313,10 @@ void bottom_limit(sprite_t* sprite){
  * @param *sp2 pointeur vers le 2eme sprite
  */
 int sprites_collide(sprite_t *sp2, sprite_t *sp1){
-     int distanceX = sp1->x - sp2->x;
-     int distanceY = sp1->y - sp2->y;
-     int distance  = sqrt(distanceX*distanceX + distanceY*distanceY);
-    return (distance = sp1->w/2 + sp2->w/2); 
+    int distanceX = sp1->x - sp2->x;
+    int distanceY = sp1->y - sp2->y;
+    int distance  = sqrt(distanceX*distanceX + distanceY*distanceY);
+    return (distance <= sp1->w/2 + sp2->w/2); 
 }
 /**
  * @brief efface les sprites en cas de collision
@@ -266,6 +333,7 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
         sp2->is_apply=0;
         world->nb_enemies_left--;
         world->score++;
+        
     }
 }
 /**
@@ -287,9 +355,10 @@ void init_ennemies(world_t* world){
     int i;
     int x;
     int y;
+    world->enemies=(sprite_t*)malloc(sizeof(sprite_t)*NB_ENEMIES); 
     for(i=0;i<NB_ENEMIES;i++){
         x = generate_number(0,SCREEN_WIDTH-SHIP_SIZE);
-        y = -SHIP_SIZE/2 - i* VERTICAL_DIST;
+        y = -(SHIP_SIZE + i* VERTICAL_DIST);
         init_sprite(&(world->enemies[i]),x,y,SHIP_SIZE,SHIP_SIZE,ENEMY_SPEED);
     }
 }
@@ -309,42 +378,70 @@ void update_ennemies(world_t* world){
  *
  * @param world
  */
-/*void lose_life(world_t* world){
-    world->life=world->life-1;
-}*/
+void lose_life(world_t* world){
+    world->life-=1;
+}
+/**
+ * @brief retourne 1 si l'etat = perdu,gagnant ou fin
+ * 
+ * @param world 
+ */
+int CheckState(world_t* world){
+    return world->state==perdu || world->state==gagnant || world->state==fin;
+}
+/**
+ * @brief returne 1 si le nombre de vie égal à 0 sinon 0
+ * 
+ * @param world 
+ * @return int 
+ */
+int CheckLife(world_t* world){
+    return world->life==0;
+}
+/**
+ * @brief retourne si le nombre d'ennemi restant = 0
+ * 
+ * @param world 
+ * @return int 
+ */
+int CheckEnemiesLeft(world_t* world){
+    return world->nb_enemies_left==0;
+}
+
+/**
+ * @brief retourne si le nombre d'ennemi qui à survie = 0
+ * 
+ * @param world 
+ * @return int 
+ */
+int CheckEnemiesSurvived(world_t* world){
+    return world->nb_enemies_survived==0;
+}
 /**
  * @brief change l'état de la partie en fonction de la situation
  * 
  * @param world 
  */
 void compute_game(world_t* world){
+  
     if(world->timer_end==TIME_ENDING){
-            world->gameover=1;
-            
+            world->gameover=1;    
         }
-    else{   
-        if(world->state==perdu || world->state==gagnant || world->state==fin){
-            //si on enfin de partie le compte à rebours progresse
+    else if(CheckState(world)){   
+            //si on est en fin de partie le compte à rebours progresse
             world->timer_end++;
-            }
-        else{
-        if(world->life==0){
+    }
+    else{
+        if(CheckLife(world)||!get_is_visible(&(world->ship))){
             //la partie est perdu
                 world->score=0;
                 world->state=perdu;
         }
-        else{
-            //si le vaisseau à été détruit
-            if(world->ship.is_apply==0){    
-                //la partie est perdu
-                world->score=0;
-                world->state=perdu;
-            }
-            //sinon si tous les ennemis sont mort ou a survécu
-            else if(world->nb_enemies_left==0){
+        //sinon si tous les ennemis sont mort ou a survécu
+         if(CheckEnemiesLeft(world)){
             //on regarde combien d'ennemi ont survécu
             //s'ils ont eté tous détruit
-            if(world->nb_enemies_survived==0){
+            if(CheckEnemiesSurvived(world)){
                 //le joueur a gagné
                 world->state=gagnant;
                 world->score*=2;
@@ -353,57 +450,145 @@ void compute_game(world_t* world){
             else{
                 world->state=fin;   
                 }
-            }
-            }
         }
-     }
+    }
 }
 
-void set_x(sprite_t* sprite,int x){
-    sprite->x=x;
-}
-void set_y(sprite_t* sprite, int y){
-    sprite->y=y;
-}
-void set_w(sprite_t* sprite,int w){
-    sprite->w=w;
-}
-void set_h(sprite_t* sprite,int h){
-    sprite->h=h;
-}
-void set_v(sprite_t* sprite,int v){
-    sprite->v=v;
-}
-void set_visible(sprite_t* sprite){
-    sprite->is_visible=1;
-}
-void set_apply(sprite_t* sprite){
-    sprite->is_apply=1;
-}
-void set_invisible(sprite_t* sprite){
-    sprite->is_visible=0;
-}
-int get_x(sprite_t* sprite){
-    return sprite->x;
-}
-int get_y(sprite_t* sprite){
-    return sprite->y;
-}
-int get_v(sprite_t* sprite){
-    return sprite->v;
-}
-int get_h(sprite_t* sprite){
-    return sprite->h;
-}
-int get_w(sprite_t* sprite){
-    return sprite->w;
-}
-int get_is_visible(sprite_t* sprite){
-    return sprite->is_visible;
-}
+/**
+ * @brief retourne la valeur de is_apply
+ * 
+ * @param sprite 
+ * @return int la valeur d'is_apply
+ */
 int get_is_apply(sprite_t* sprite){
     return sprite->is_apply;
 }
-void set_not_apply(sprite_t* sprite){
-    sprite->is_apply=0;
+/**
+ * @brief retourne la valeur de is_invisible
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_is_visible(sprite_t* sprite){
+    return sprite->is_visible;
+    }
+/**
+ * @brief retourne la valeur de x 
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_x(sprite_t* sprite){
+    return sprite->x;
 }
+/**
+ * @brief retourne la valeur de y
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_y(sprite_t* sprite){
+    return sprite->y;
+}
+/**
+ * @brief retourne la valeur de h
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_h(sprite_t* sprite){
+    return sprite->h;
+}
+/**
+ * @brief retourne la valeur de v
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_v(sprite_t* sprite){
+    return sprite->v;
+}
+/**
+ * @brief retourne la valeur de w
+ * 
+ * @param sprite 
+ * @return int 
+ */
+int get_w(sprite_t* sprite){
+    return sprite->w;
+}
+/**
+ * @brief met is_visible à 1
+ * @param sprite 
+ */
+void set_visible(sprite_t* sprite){
+    sprite->is_visible=1;
+}
+/**
+ * @brief met is_visible à 0
+ * 
+ */
+void set_invisible(sprite_t* sprite){
+    sprite->is_visible=0;
+}
+/**
+ * @brief rend le sprite applicable
+ * 
+ * @param sprite 
+ */
+void set_apply(sprite_t* sprite){
+    sprite->is_apply = 1;
+}
+/**
+ * @brief rend le sprite inapplicable
+ * 
+ * @param sprite 
+ */
+void set_not_apply(sprite_t* sprite){
+    sprite->is_apply = 0;
+}
+/**
+ * @brief change la valeur de x
+ * 
+ * @param sprite 
+ * @param x 
+ */
+void set_x(sprite_t* sprite,int x){
+    sprite->x=x;
+}
+/**
+ * @brief change la valeur de y
+ * 
+ * @param sprite 
+ * @param y
+ */
+void set_y(sprite_t* sprite,int y){
+    sprite->y=y;
+}
+/**
+ * @brief change la valeur de h
+ * 
+ * @param sprite 
+ * @param h
+ */
+void set_h(sprite_t* sprite,int h){
+    sprite->h=h;
+}
+/**
+ * @brief change la valeur de w
+ * 
+ * @param sprite 
+ * @param w 
+ */
+void set_w(sprite_t* sprite,int w){
+    sprite->w=w;
+}
+/**
+ * @brief change la valeur de v
+ * 
+ * @param sprite 
+ * @param v
+ */
+void set_v(sprite_t* sprite,int v ){
+    sprite->v=v;
+    }

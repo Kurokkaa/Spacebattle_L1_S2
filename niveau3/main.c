@@ -67,7 +67,7 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
     
     ressources->coeur_vide = load_image("ressources/coeur_vide.bmp",renderer);
 
-    ressources->solo_menu = load_image("ressources/solo.bmp",renderer);
+    ressources->solo_menu = load_image("ressources/Solo.bmp",renderer);
 
     init_music(&(ressources->sound));
 }
@@ -109,6 +109,7 @@ void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressource
 
 int WinMain( int argc, char* args[] )
 {
+    srand(time(NULL));
     SDL_Event event;
     world_t world;
     ressources_t ressources;
@@ -122,9 +123,7 @@ int WinMain( int argc, char* args[] )
     while(!is_game_over(&world)){ //tant que le jeu n'est pas fini
        //mise à jour des données liée à la physique du monde
         update_data(&world);
-        world.ship.is_apply=1;
-        world.ship.is_visible=1;
-
+        
         //gestion des évènements
         handle_events(&event,&world);
         

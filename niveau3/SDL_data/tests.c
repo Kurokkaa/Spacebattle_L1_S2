@@ -123,9 +123,9 @@ void test_update_enemies(){
 int WinMain( int argc, char* args[] ){
     world_t world;
 
-    //test_init_sprite();
-    //test_ship_screen_limit();
-    //test_vertical_limit();
-    //test_init_enemies();
+    test_init_sprite();
+    test_ship_screen_limit();
+    test_vertical_limit();
+    test_init_enemies();
     test_update_enemies();
 }

@@ -83,7 +83,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
         break;
     case menu:
-        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,60,"Jouer",ressources->font);
+        
         apply_texture(ressources->solo_menu,renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2);
         apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+50,SCREEN_WIDTH/3,60,"Highscore",ressources->font);
         apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+100,SCREEN_WIDTH/3,60,"Quitter",ressources->font);

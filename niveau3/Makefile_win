@@ -8,7 +8,7 @@ OBJ = $(SRC:%.c=%.o)
 PROG = spacebattle.exe
 CC=gcc
 
-DEFAULT:$(PROG) clean
+DEFAULT:$(PROG) test clean
 
 $(PROG): $(OBJ)
 	gcc $(CFLAGS) $(OBJ) $(LDFLAGS) -o $@ -L "..\SDL2-2.0.20\x86_64-w64-mingw32\lib"
@@ -21,7 +21,7 @@ doc: $(PROG)
 	
 test:SDL_data\test.exe 
 
-SDL_data\test.exe: SDL_data\tests.o SDL_data\SDL_data.o struct\struct.o
+SDL_data\test.exe: SDL_data\tests.o SDL_data\SDL_data.o 
 	gcc $(CFLAGS) $^ $(LDFLAGS) -o $@ -L "../SDL2-2.0.20\x86_64-w64-mingw32\lib" 
 
 tests.o:SDL_data\tests.c
