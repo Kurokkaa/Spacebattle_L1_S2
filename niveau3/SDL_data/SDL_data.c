@@ -22,7 +22,7 @@ void init_data(world_t * world){
     init_sprite(&(world->missile),SCREEN_WIDTH/2-MISSILE_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2+MISSILE_SIZE-SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, MISSILE_SPEED);
     init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
     init_boss(&(world->mboss),0,-30,MBOSS_SIZE,MBOSS_SIZE-10,1);
-    init_sprite&(world->missile_mboss,30,MBOSS_SIZE,MISSILE_SIZE,MISSILE_SIZE,MISSILE_SPEED);    
+    init_sprite(&(world->missile_mboss),30,MBOSS_SIZE,MISSILE_SIZE,MISSILE_SIZE,MISSILE_SPEED);    
     set_invisible(&(world->missile));
              /*---------------------------------------------------------------------------------------------*/
     //on n'est pas à la fin du jeu
@@ -35,7 +35,7 @@ void init_data(world_t * world){
     world->life=LIFE_NUMBER;
     world->menu_courant=0;             //le premier bouton du menu est sélectionné
     world->playable = 1;
-       
+    world->cooldown = 0;
 }
 
 void init_boss(sprite_t* boss,int x,int y,int w, int h,int v){
@@ -145,7 +145,18 @@ void handle_mboss(world_t* world){
             }       
         }
     }
-    handle_sprites_collision(&(world->ship),&(world->missile_mboss));
+    handle_sprites_collision(&(world->ship),&(world->missile_mboss),world);
+    if(world->cooldown<=0){
+        world->cooldown=150;
+        int shoot_chance=generate_number(1,101);
+        if(shoot_chance>=1 && shoot_chance>=50){
+            set_visible(&(world->missile_mboss));
+            printf("je tire!");
+        }
+    }
+    else{
+        world->cooldown--;
+    }
 }
 
 /**
@@ -408,7 +419,6 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
         sp1->is_apply=0;
         sp2->is_apply=0;
         world->nb_enemies_left--;
-        printf("%d",world->wave);
         world->score++;
         add_animation(sp2->x,sp2->y,world);
         

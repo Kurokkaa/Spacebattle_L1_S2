@@ -73,6 +73,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
                 apply_sprite(renderer,ressources->missile,&world->missile);
 
             }
+            apply_sprite(renderer,ressources->missile_boss,&world->missile_mboss);
                                     //---affichge des textes---//
             apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
             apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);

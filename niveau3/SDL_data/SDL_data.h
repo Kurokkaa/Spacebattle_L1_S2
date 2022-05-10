@@ -100,6 +100,7 @@ struct world_s
     animation_t explosion[10]; /*!<tableau qui stocke les animation de l'explosion*/
     int explosion_counter; /*!<nombres d'explosions*/
     int wave;
+    int cooldown;
 };
 
 typedef struct world_s world_t;

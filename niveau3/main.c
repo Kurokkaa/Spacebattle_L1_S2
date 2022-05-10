@@ -82,12 +82,13 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 
     ressources->quitter_menu = load_image("ressources/quitter.bmp",renderer);
 
-    ressources->highscore_menu= load_image("ressources/highscore.bmp",renderer);
+    ressources->highscore_menu = load_image("ressources/highscore.bmp",renderer);
 
-    ressources->mini_boss_D= load_image("ressources/boss1d.bmp",renderer);
+    ressources->mini_boss_D = load_image("ressources/boss1d.bmp",renderer);
 
-    ressources->mini_boss_G= load_image("ressources/boss1g.bmp",renderer);
+    ressources->mini_boss_G = load_image("ressources/boss1g.bmp",renderer);
 
+    ressources->missile_boss = load_image("ressources/p1g0p4eamu3oma1h18nnsnla9m4-0.bmp",renderer);
 
 
     init_music(&(ressources->sound));
