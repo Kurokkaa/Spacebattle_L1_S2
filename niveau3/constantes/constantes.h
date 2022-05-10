@@ -37,6 +37,10 @@
 
 #define MISSILE_SIZE 8
 /**
+ * @brief taille du missile du boss
+ */
+#define MBOSS_MISSILE_SIZE 28
+/**
  * @brief vitesse verticale de l'ennemi
  */
 #define ENEMY_SPEED 1

@@ -35,6 +35,7 @@ void clean_ressources(ressources_t *ressources){
     clean_texture(ressources->mini_boss_G);
     clean_texture(ressources->quitter_menu);
     clean_texture(ressources->highscore_menu);
+    clean_texture(ressources->missile_boss);
     clean_texture_textures_enemies(ressources->skin_ennemy);
     clean_audio(&(ressources->sound));
     clean_font(ressources->font);
@@ -88,7 +89,7 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 
     ressources->mini_boss_G = load_image("ressources/boss1g.bmp",renderer);
 
-    ressources->missile_boss = load_image("ressources/p1g0p4eamu3oma1h18nnsnla9m4-0.bmp",renderer);
+    ressources->missile_boss = load_image("ressources/missilemb.bmp",renderer);
 
 
     init_music(&(ressources->sound));

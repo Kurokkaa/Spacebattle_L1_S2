@@ -22,8 +22,9 @@ void init_data(world_t * world){
     init_sprite(&(world->missile),SCREEN_WIDTH/2-MISSILE_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2+MISSILE_SIZE-SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, MISSILE_SPEED);
     init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
     init_boss(&(world->mboss),0,-30,MBOSS_SIZE,MBOSS_SIZE-10,1);
-    init_sprite(&(world->missile_mboss),30,MBOSS_SIZE,MISSILE_SIZE,MISSILE_SIZE,MISSILE_SPEED);    
+    init_sprite(&world->missile_mboss,30,MBOSS_SIZE,MISSILE_SIZE,MBOSS_MISSILE_SIZE,MISSILE_SPEED);    
     set_invisible(&(world->missile));
+    set_invisible(&(world->missile_mboss));
              /*---------------------------------------------------------------------------------------------*/
     //on n'est pas à la fin du jeu
     world->gameover = 0;   
@@ -36,6 +37,7 @@ void init_data(world_t * world){
     world->menu_courant=0;             //le premier bouton du menu est sélectionné
     world->playable = 1;
     world->cooldown = 0;
+       
 }
 
 void init_boss(sprite_t* boss,int x,int y,int w, int h,int v){
@@ -99,28 +101,33 @@ int check_wave(world_t* world){
     }      //boss final
 }
 void move_missile_mboss(world_t* world){
-    if(get_is_visible(&(world->missile))){
+    if(get_is_visible(&(world->missile_mboss))){
     set_y(&(world->missile_mboss),get_y(&(world->missile_mboss))+MISSILE_SPEED); /*!< Si le missile est visible, c'est qu'il doit se déplacer */
     }
     //sinon il est positionné au dessus du vaisseau 
     else{
-        set_x(&(world->missile_mboss),get_x(&(world->mboss))+SHIP_SIZE/2-MISSILE_SIZE/2); /*!< sinon il doit être placer au dessus du vaisseau*/
-        set_y(&(world->missile_mboss),get_y(&(world->mboss))); /*!< sinon il doit être placer au dessus du vaisseau*/
+        if(world->mboss.direction==1){
+        set_x(&(world->missile_mboss),get_x(&(world->mboss))+120-MBOSS_MISSILE_SIZE/2); /*!< sinon il doit être placer au dessus du vaisseau*/
+        set_y(&(world->missile_mboss),get_y(&(world->mboss))+MBOSS_SIZE);
+        }
+        else{
+        set_x(&(world->missile_mboss),get_x(&(world->mboss))+16-MBOSS_MISSILE_SIZE/2); /*!< sinon il doit être placer au dessus du vaisseau*/
+        set_y(&(world->missile_mboss),get_y(&(world->mboss))+MBOSS_SIZE);
+        }
     }
 }
 void replace_missile_mboss(world_t* world){
-    if(get_y(&(world->missile_mboss))<=0 || !get_is_apply(&(world->missile_mboss))){ 
+    if(get_y(&(world->missile_mboss))>=SCREEN_HEIGHT){ 
         //on le cache afin de la replacer
-        set_apply(&(world->missile_mboss));
         set_invisible(&(world->missile_mboss));  
     }
 }
 void handle_mboss(world_t* world){
     world->mboss.is_visible=1;
-    if(world->mboss.x<=0){
+    if(world->mboss.x<=-MBOSS_SIZE){
         world->mboss.direction=1;
     }
-    if(world->mboss.x>=SCREEN_WIDTH-MBOSS_SIZE){
+    if(world->mboss.x>=SCREEN_WIDTH){
         world->mboss.direction=-1;
     }
 
@@ -145,18 +152,22 @@ void handle_mboss(world_t* world){
             }       
         }
     }
-    handle_sprites_collision(&(world->ship),&(world->missile_mboss),world);
+    if(sprites_collide(&world->missile_mboss,&world->ship)){
+        world->life--;
+        set_invisible(&world->missile_mboss);
+    }
     if(world->cooldown<=0){
-        world->cooldown=150;
-        int shoot_chance=generate_number(1,101);
-        if(shoot_chance>=1 && shoot_chance>=50){
-            set_visible(&(world->missile_mboss));
+        world->cooldown = 50;
+        int shoot_chance = generate_number(1,101);
+        if(shoot_chance>=1 && shoot_chance<=80 && world->mboss.x>=0 && world->mboss.x<=SCREEN_WIDTH-MBOSS_SIZE){
+            set_visible(&world->missile_mboss);
             printf("je tire!");
         }
     }
     else{
         world->cooldown--;
     }
+    
 }
 
 /**
@@ -419,6 +430,7 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
         sp1->is_apply=0;
         sp2->is_apply=0;
         world->nb_enemies_left--;
+        printf("%d",world->wave);
         world->score++;
         add_animation(sp2->x,sp2->y,world);
         
