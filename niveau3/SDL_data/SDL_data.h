@@ -147,4 +147,6 @@ void set_wave(world_t* world);
 int check_wave(world_t* world);
 void init_boss(sprite_t* boss,int x,int y,int w, int h,int v);
 void move_missile_mboss(world_t* world);
+void replace_missile_mboss(world_t* world);
+void handle_mboss(world_t* world);
 #endif
