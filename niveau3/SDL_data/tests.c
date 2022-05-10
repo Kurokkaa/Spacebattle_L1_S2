@@ -25,7 +25,7 @@ void test_ship_screen_limit(){
     printf("droite x=%d \n",sprite.x);
 }
 
-void test_vertical_limit_param(sprite_t* sprite){
+/*void test_vertical_limit_param(sprite_t* sprite){
     printf("y=%d, ",sprite->y);
     bottom_limit(sprite);
     printf("y=%d \n",sprite->y);
@@ -37,7 +37,7 @@ void test_vertical_limit(){
         printf("%d ",sprite.y);
         test_vertical_limit_param(&sprite);
     }
-}
+}*/
 
 void test_sprites_collide_param(sprite_t* sp1, sprite_t* sp2 ){
     printf("%s \n",sprites_collide(sp1,sp2)==1 ? "il y a collision" : "il n'y a pas collsion");
@@ -125,7 +125,7 @@ int WinMain( int argc, char* args[] ){
 
     test_init_sprite();
     test_ship_screen_limit();
-    test_vertical_limit();
+    //test_vertical_limit();
     test_init_enemies();
     test_update_enemies();
 }

@@ -11,6 +11,7 @@
 #define SDL_graphics
 
 
+
 #include "../constantes/constantes.h"
 #include "..\sdl2\sdl2-light.h"
 #include "..\sdl2\sdl2-ttf-light.h"
@@ -28,20 +29,26 @@
  * @param menu_sprite logo du menu
  * @param coeur_plein texture des coeurs plein
  * @param coeur_vide  texture des coeurs vides
+ * @param sound liste des sons
 */
 
 struct ressources_s
 {
     SDL_Texture* background; /*!< Texture liée à l'image du fond de l'écran. */
-    SDL_Texture* skin_ship; /*!< apparence du vaisseau*/
-    SDL_Texture* skin_ennemy[NB_ENEMIES]; /*!< apparence de l'ennemi*/
-    SDL_Texture* missile; /*!<apparence du missile*/
+    SDL_Texture* skin_ship; /*!< Texture du vaisseau*/
+    SDL_Texture* skin_ennemy[NB_ENEMIES]; /*!< Texture de l'ennemi*/
+    SDL_Texture* missile; /*!<Apparence du missile*/
     TTF_Font* font;  /*!< Police d'ecriture */
-    SDL_Texture* menu_sprite;
-    SDL_Texture* coeur_plein;
-    SDL_Texture* coeur_vide;
-    audio_t sound;
-    SDL_Texture* solo_menu;
+    SDL_Texture* menu_sprite; /*!<Texture du logo dans le menu*/
+    SDL_Texture* coeur_plein; /*!< Texture des coeurs pleins */
+    SDL_Texture* coeur_vide; /*!< Texture des coeurs vide */
+    SDL_Texture* solo_menu; /*!< Texture du bouton solo dans le menu*/
+    SDL_Texture* quitter_menu; /*!< Texture du bouton quitter*/
+    SDL_Texture* highscore_menu; /*:<Texture du bouton highscore dans le menu*/
+    SDL_Texture* explosion; /*!< Texture de l'animation des explosions*/
+    SDL_Texture* mini_boss_G;/*! Texture du boss qui va à gauche*/
+    SDL_Texture* mini_boss_D;/*: Texture du boss qui va à droite*/
+    audio_t sound;          /*!< Liste des sons */
 };
 
 typedef struct ressources_s ressources_t;
@@ -52,4 +59,5 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
 void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t sprite[]);
 void display_life(SDL_Renderer *renderer,ressources_t* ressources,world_t* world);
 void display_selection_zone(int x, int y, int w, int h,SDL_Renderer *renderer);
+void draw_animation(world_t* world,ressources_t* ressources,SDL_Renderer* renderer);
 #endif

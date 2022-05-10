@@ -25,26 +25,47 @@
  * @param v la vitesse vertical du sprite 
  * @param is_visible le sprite doit-il être affiché ou non  
  * @param is_apply le sprite doit-il être appliqué
+ * @param life_points les points de vies du boss
  */
 
 struct sprite_s
-{
-    /* data */
+{ 
     int x; /*!< abscysses du sprite*/
     int y; /*!< ordonnée du sprite*/
     int h; /*!< hauteur du sprite*/
     int w; /*!< largeur du sprite*/
     int v; /*!< vitesse du sprite*/
-    int is_visible; /*!< */
-    int is_apply;  
+    int is_visible; /*!<le sprite est-il visible */
+    int is_apply;  /*!<le sprite est-il appliqué */
+    int life_points; /*!<point de vie*/
+    int direction;
 };
 
 typedef struct sprite_s sprite_t;
 
 
 
+/**
+ * @brief struct qui gere les animation
+ * @param frame_number numéro de l'étape de l'animation
+ * @param frame_timer variable qui gère le frame rate de l'animation
+ * @param x coordonées en x de l'animation
+ * @param y coordonées en y de l'animtion
+ * @param w largeur du sprite de l'animation
+ * @param h hauteur du sprite de l'animation
+ */
 
+struct animation_s
+{
+    int frame_number; /*!<numéro de l'étape de l'animation*/
+    int frame_timer; /*!<frame rate de l'animation*/
+    int x;  /*!<coordonées en x de l'animation*/
+    int y; /*!<coordonées en y de l'animtion*/
+    int w; /*!largeur du sprite de l'animation*/
+    int h; /*!hauteur du sprite de l'animation*/
+};
 
+typedef struct animation_s animation_t;
 
 /**
  * \brief Représentation du monde du jeu
@@ -59,22 +80,26 @@ typedef struct sprite_s sprite_t;
  * \param timer_end timer de fermeture de la fenêtre
  * \param life nombre de vie du vaisseau
 */
-
 struct world_s
 {
     sprite_t ship; /*!<sprite du vaisseau du joueur*/
     sprite_t* enemies; /*!<tableau de sprite_t représentant les ennemies*/
-    sprite_t missile; /*<sprite du missile*.*/
+    sprite_t missile; /*<sprite du missile*/
+    sprite_t mboss; /*<sprite du mini boss*/
+    sprite_t missile_mboss;
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     int nb_enemies_survived; /*!< nombre d'ennemis survécu*/
-    enum etat state; /*!< etat du programme*/
-    int nb_enemies_left; /*!< nombre d'ennemis restant*/
+    enum etat state; /*!< état du programme*/
+    int nb_enemies_left; /*!< nombres d'ennemis restants*/
     int score; /*!< score actuel du joueur*/
     int timer_end; /*!< compte à rebours de la fermeture du programme*/
     int life;   /*!< nombre de vie restant du joueur*/
     int menu_courant; /*!< position dans le menu*/
     int x_logo; /*!< abscysse du logo dans le menu*/
-    int playable;
+    int playable; /*!<la musique doit-elle être joué*/
+    animation_t explosion[10]; /*!<tableau qui stocke les animation de l'explosion*/
+    int explosion_counter; /*!<nombres d'explosions*/
+    int wave;
 };
 
 typedef struct world_s world_t;
@@ -88,7 +113,6 @@ void handle_events(SDL_Event *event,world_t *world);
 void init_sprite(sprite_t *sprite, int x, int y, int w, int h, int v);
 void right_limit(sprite_t* sprite);
 void left_limit(sprite_t* sprite);
-void bottom_limit(sprite_t* sprite);
 int sprites_collide(sprite_t *sp2, sprite_t *sp1);
 void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2,world_t* world);
 void init_ennemies(world_t* world);
@@ -117,4 +141,9 @@ void set_w(sprite_t* sprite,int w);
 void set_v(sprite_t* sprite,int v );
 void set_apply(sprite_t* sprite);
 void set_not_apply(sprite_t* sprite);
+void add_animation(int x, int y,world_t* world);
+void set_wave(world_t* world);
+int check_wave(world_t* world);
+void init_boss(sprite_t* boss,int x,int y,int w, int h,int v);
+void move_missile_mboss(world_t* world);
 #endif

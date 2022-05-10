@@ -19,9 +19,10 @@
 void init_data(world_t * world){
                 /*----------------------------------initialisation des sprites--------------------------------*/
     init_ennemies(world);
-    
-   
     init_sprite(&(world->missile),SCREEN_WIDTH/2-MISSILE_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2+MISSILE_SIZE-SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, MISSILE_SPEED);
+    init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
+    init_boss(&(world->mboss),0,-30,MBOSS_SIZE,MBOSS_SIZE-10,1);
+    init_sprite&(world->missile_mboss,30,MBOSS_SIZE,MISSILE_SIZE,MISSILE_SIZE,MISSILE_SPEED);    
     set_invisible(&(world->missile));
              /*---------------------------------------------------------------------------------------------*/
     //on n'est pas à la fin du jeu
@@ -32,19 +33,20 @@ void init_data(world_t * world){
     world->state=menu;                 //on ne lance pas le jeu au démarrage de l'application mais le menu
     world->timer_end=0;                //compte à rebours de la fermeture de la fenêtre
     world->life=LIFE_NUMBER;
-    world->menu_courant=0;
+    world->menu_courant=0;             //le premier bouton du menu est sélectionné
     world->playable = 1;
-    init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
-    printf("%d",world->ship.is_apply);
-    printf("%d",world->ship.is_visible);
-    printf("%d",world->score);
+       
 }
 
-
+void init_boss(sprite_t* boss,int x,int y,int w, int h,int v){
+    init_sprite(boss,x,y,w,h,v);
+    set_invisible(boss); //il est invisible au départ
+    boss->life_points=10;
+    boss->direction=1; //sens de déplacement du mini boss
+}
 
 /**
  * @brief afficher les données d'un sprite
- * 
  * @param sprite le sprite examiné
  */
 void print_sprite(sprite_t* sprite){
@@ -74,12 +76,84 @@ void replace_missile(world_t* world){
         set_invisible(&(world->missile));  
     }
 }
+/**
+ * @brief compte le nombre d'enemis tués
+ * 
+ * @param world le monde du jeu
+ */
+void set_wave(world_t* world){
+    world->wave=(NB_ENEMIES-world->nb_enemies_left)/(NB_ENEMIES/NB_WAVE);
+    
+    
+}
+
+int check_wave(world_t* world){
+    if (world->wave>=0 && world->wave<NB_WAVE/2 || world->wave>NB_WAVE/2 && world->wave<NB_WAVE){
+        return 0;               //pas de boss
+    }
+    if (world->wave==5){
+        return 1;           //mini boss
+    }
+    if (world->wave==10){
+        return 2;           
+    }      //boss final
+}
+void move_missile_mboss(world_t* world){
+    if(get_is_visible(&(world->missile))){
+    set_y(&(world->missile_mboss),get_y(&(world->missile_mboss))+MISSILE_SPEED); /*!< Si le missile est visible, c'est qu'il doit se déplacer */
+    }
+    //sinon il est positionné au dessus du vaisseau 
+    else{
+        set_x(&(world->missile_mboss),get_x(&(world->mboss))+SHIP_SIZE/2-MISSILE_SIZE/2); /*!< sinon il doit être placer au dessus du vaisseau*/
+        set_y(&(world->missile_mboss),get_y(&(world->mboss))); /*!< sinon il doit être placer au dessus du vaisseau*/
+    }
+}
+void replace_missile_mboss(world_t* world){
+    if(get_y(&(world->missile_mboss))<=0 || !get_is_apply(&(world->missile_mboss))){ 
+        //on le cache afin de la replacer
+        set_apply(&(world->missile_mboss));
+        set_invisible(&(world->missile_mboss));  
+    }
+}
+void handle_mboss(world_t* world){
+    world->mboss.is_visible=1;
+    if(world->mboss.x<=0){
+        world->mboss.direction=1;
+    }
+    if(world->mboss.x>=SCREEN_WIDTH-MBOSS_SIZE){
+        world->mboss.direction=-1;
+    }
+
+    if(world->mboss.direction==1){
+        world->mboss.x+=world->mboss.v;
+    } 
+    else{
+        world->mboss.x-=world->mboss.v;
+    }
+     //s'il est visible il est donc lancé il doit monter en fonction de MISSILE_SPEED
+    move_missile_mboss(world);
+    replace_missile_mboss(world);
+    if(world->missile.is_visible){
+        if(sprites_collide(&(world->missile),&(world->mboss))){
+            world->missile.is_apply=0;
+            world->missile.is_visible=0;
+            world->mboss.life_points--;
+            if(world->mboss.life_points==0){
+                world->mboss.is_apply=0;
+                world->mboss.is_visible=0;
+                add_animation(world->mboss.x,world->mboss.y,world);
+            }       
+        }
+    }
+    handle_sprites_collision(&(world->ship),&(world->missile_mboss));
+}
 
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param les données du monde
  */
 void update_data(world_t *world){
+    int i;
     switch (world->state)
     {
     case menu:
@@ -89,12 +163,34 @@ void update_data(world_t *world){
         else world->x_logo+=3;
         break;
     case jeu:
+        set_wave(world);
+        if(check_wave(world)==1){
+            if(world->mboss.is_visible==0){
+                for (i=0;i<world->nb_enemies_left;i++){
+                    world->enemies[NB_ENEMIES-world->nb_enemies_left+i].y=-(i*VERTICAL_DIST)-SHIP_SIZE;
+                }
+                set_visible(&(world->mboss));
+            }
+            if(world->mboss.life_points<1){
+                update_ennemies(world);
+                handle_ennemies(world);
+            }
+            else{
+            handle_mboss(world);
+            }
+            
+        }
+       /* if(check_wave(world)==2){
+            update_boss(world);
+        };*/
+        if(check_wave(world)==0 || check_wave(world)==2){
+            update_ennemies(world);
+            handle_ennemies(world);
+        };
         replace_missile(world);
         move_missile(world);
         left_limit(&(world->ship));
         right_limit(&(world->ship));
-        update_ennemies(world);
-        handle_ennemies(world);  
         compute_game(world);
         break;
     case perdu:
@@ -106,18 +202,7 @@ void update_data(world_t *world){
     case fin:
         compute_game(world);
         break;
-    default:
-        break;
-    }
-    if(world->state==menu){
-        
-    }
-    else{
-    
-    }
-
-    
-
+    } 
 }
 
 /**
@@ -127,27 +212,27 @@ void update_data(world_t *world){
 void handle_ennemies(world_t* world){
     //si le vaisseau n'a pas été détruit
     if(get_is_apply(&(world->ship))){
-        //on vérifie les collision avec les 
+        //on vérifie les collision avec les ennemis
         for(int i = 0; i<NB_ENEMIES;i++){
-            //si l'ennemi n'a pas été détruit
+            //si l'ennemi n'a pas été détruit on vérifie la collison
             if(get_is_apply(&(world->enemies[i]))&&world->enemies[i].y>-SHIP_SIZE/2){
                 handle_sprites_collision(&(world->ship),&(world->enemies[i]),world);
+               
                 //si le missile n'est pas visible il doit être ignoré
                 if(get_is_visible(&(world->missile))){
                     handle_sprites_collision(&(world->missile),&(world->enemies[i]),world);
                 }
             }
-    //si le vaisseau enemi est en dehors de l'ecran
-    //il a survécu
-    //et on le retire du jeu et on enleve une vie au joueur
-    if(get_y(&(world->enemies[i]))>=SCREEN_HEIGHT && world->enemies[i].is_apply){
-        set_not_apply(&(world->enemies[i]));
-        set_invisible(&(world->enemies[i]));
-        world->nb_enemies_survived++;
-        world->nb_enemies_left--;
-        lose_life(world);
-
-    }
+            //si le vaisseau enemi est en dehors de l'ecran
+            //il a survécu
+            //et on le retire du jeu et on enleve une vie au joueur
+            if(get_y(&(world->enemies[i]))>=SCREEN_HEIGHT && world->enemies[i].is_apply){
+                set_not_apply(&(world->enemies[i]));
+                set_invisible(&(world->enemies[i]));
+                world->nb_enemies_survived++;
+                world->nb_enemies_left--;
+                lose_life(world);
+            }
         }
     }
 }
@@ -234,23 +319,23 @@ void handle_events(SDL_Event *event,world_t *world){
                 case jeu:
                     switch (event->key.keysym.sym)
                     {
-                    case SDLK_d:
-                        printf("La touche D est appuyée\n");
-                        break;
-                    case SDLK_RIGHT:
-                        set_x(&(world->ship),get_x(&world->ship)+10);
-                        break;
-                    case SDLK_LEFT:
-                        set_x(&(world->ship),get_x(&world->ship)-10);
-                        break;
-                    case SDLK_SPACE:
-                        if(get_is_visible(&(world->ship))){ // on peut tirer seulement si le vaisseau est visible
-                            set_visible(&(world->missile));
-                        }
-                        break;
-                    case SDLK_ESCAPE:
-                        world->gameover=1;
-                        break;
+                        case SDLK_d:
+                            printf("La touche D est appuyée\n");
+                            break;
+                        case SDLK_RIGHT:
+                            set_x(&(world->ship),get_x(&world->ship)+10);
+                            break;
+                        case SDLK_LEFT:
+                            set_x(&(world->ship),get_x(&world->ship)-10);
+                            break;
+                        case SDLK_SPACE:
+                            if(get_is_visible(&(world->ship))){ // on peut tirer seulement si le vaisseau est visible
+                                set_visible(&(world->missile));
+                            }
+                            break;
+                        case SDLK_ESCAPE:
+                            world->gameover=1;
+                            break;
                     }
                 }
         }
@@ -297,16 +382,7 @@ void right_limit(sprite_t* sprite){
         sprite->x=SCREEN_WIDTH-SHIP_SIZE;
     }
 }
-/**
- * @brief fonction qui va repositionner l'ennemi en haut de l'ecran s'il dépasse le bas de l'écran
- * 
- * @param sprite l'ennemi
- */
-void bottom_limit(sprite_t* sprite){
-    if(sprite->y>=SCREEN_HEIGHT){
-        sprite->y=0;
-    }
-}
+
 /**
  * @brief retourne 1 si une collision entre les deux sprites à lieu sinon 0
  * @param *spa pointeur vers le 1eme sprite
@@ -332,7 +408,9 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
         sp1->is_apply=0;
         sp2->is_apply=0;
         world->nb_enemies_left--;
+        printf("%d",world->wave);
         world->score++;
+        add_animation(sp2->x,sp2->y,world);
         
     }
 }
@@ -399,8 +477,7 @@ int CheckLife(world_t* world){
     return world->life==0;
 }
 /**
- * @brief retourne si le nombre d'ennemi restant = 0
- * 
+ * @brief retourne 1 si le nombre d'ennemi restant = 0
  * @param world 
  * @return int 
  */
@@ -409,8 +486,7 @@ int CheckEnemiesLeft(world_t* world){
 }
 
 /**
- * @brief retourne si le nombre d'ennemi qui à survie = 0
- * 
+ * @brief retourne 1 si le nombre d'ennemi qui à survécu = 0
  * @param world 
  * @return int 
  */
@@ -419,7 +495,6 @@ int CheckEnemiesSurvived(world_t* world){
 }
 /**
  * @brief change l'état de la partie en fonction de la situation
- * 
  * @param world 
  */
 void compute_game(world_t* world){
@@ -437,10 +512,10 @@ void compute_game(world_t* world){
                 world->score=0;
                 world->state=perdu;
         }
-        //sinon si tous les ennemis sont mort ou a survécu
+        //sinon si tous les ennemis sont mort ou ont survécu
          if(CheckEnemiesLeft(world)){
-            //on regarde combien d'ennemi ont survécu
-            //s'ils ont eté tous détruit
+            //on regarde combien d'ennemis ont survécu
+            //s'ils ont eté tous détruits
             if(CheckEnemiesSurvived(world)){
                 //le joueur a gagné
                 world->state=gagnant;
@@ -453,7 +528,17 @@ void compute_game(world_t* world){
         }
     }
 }
-
+void add_animation(int x, int y,world_t* world){
+    if(world->explosion_counter<10){ //si la liste d'attente n'est pas complète 
+        world->explosion[world->explosion_counter].frame_number=0; 
+        world->explosion[world->explosion_counter].frame_timer=TIMER_BETWEEN_2_FRAMES;
+        world->explosion[world->explosion_counter].x=x;
+        world->explosion[world->explosion_counter].y=y;
+        world->explosion[world->explosion_counter].w=64;
+        world->explosion[world->explosion_counter].h=64;
+        world->explosion_counter++;
+    }
+}
 /**
  * @brief retourne la valeur de is_apply
  * 
@@ -465,7 +550,6 @@ int get_is_apply(sprite_t* sprite){
 }
 /**
  * @brief retourne la valeur de is_invisible
- * 
  * @param sprite 
  * @return int 
  */

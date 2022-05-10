@@ -26,6 +26,15 @@ void clean_ressources(ressources_t *ressources){
     clean_texture(ressources->background);
     clean_texture(ressources->skin_ship);
     clean_texture(ressources->missile);
+    clean_texture(ressources->coeur_plein);
+    clean_texture(ressources->coeur_vide);
+    clean_texture(ressources->menu_sprite);
+    clean_texture(ressources->explosion);
+    clean_texture(ressources->solo_menu);
+    clean_texture(ressources->mini_boss_D);
+    clean_texture(ressources->mini_boss_G);
+    clean_texture(ressources->quitter_menu);
+    clean_texture(ressources->highscore_menu);
     clean_texture_textures_enemies(ressources->skin_ennemy);
     clean_audio(&(ressources->sound));
     clean_font(ressources->font);
@@ -69,8 +78,21 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 
     ressources->solo_menu = load_image("ressources/Solo.bmp",renderer);
 
+    ressources->explosion = load_image("ressources/explosion.bmp",renderer);
+
+    ressources->quitter_menu = load_image("ressources/quitter.bmp",renderer);
+
+    ressources->highscore_menu= load_image("ressources/highscore.bmp",renderer);
+
+    ressources->mini_boss_D= load_image("ressources/boss1d.bmp",renderer);
+
+    ressources->mini_boss_G= load_image("ressources/boss1g.bmp",renderer);
+
+
+
     init_music(&(ressources->sound));
 }
+
 /**
 * \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
 * \param window la fenêtre du jeu
@@ -81,8 +103,6 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
     clean_ressources(ressources);
     clean_sdl(renderer,window);
-    
-
 }
 
 /**
@@ -119,7 +139,8 @@ int WinMain( int argc, char* args[] )
     
     //initialisation du jeu
     init(&window,&renderer,&ressources,&world);
-   
+    
+    
     while(!is_game_over(&world)){ //tant que le jeu n'est pas fini
        //mise à jour des données liée à la physique du monde
         update_data(&world);

@@ -13,8 +13,7 @@
 
 #include "..\..\SDL2-2.0.20\x86_64-w64-mingw32\include\SDL2\SDL_mixer.h"
 #include <stdio.h>
-#define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
-#define Mix_PlayChannel(channel,chunk,loops) Mix_PlayChannelTimed(channel,chunk,loops,-1)
+
 
 struct audio_s
 {

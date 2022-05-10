@@ -25,6 +25,11 @@
 
 #define SHIP_SIZE 30
 
+/**
+ * @brief Taille du Mini boss
+ * 
+ */
+#define MBOSS_SIZE 135
 
 /**
  * \brief Taille du missile
@@ -42,7 +47,7 @@
 /**
  * @brief nombres d'ennemies
  */
-#define NB_ENEMIES 2
+#define NB_ENEMIES 10
 /**
  * @brief distance vertical entre deux ennemies
  * 
@@ -59,9 +64,14 @@
  */
 #define LIFE_NUMBER 3
 /**
+ * @brief nombre de vagues d'ennemies
+ * 
+ */
+#define NB_WAVE 10
+/**
  * @brief énumeration afin de gérer les différents états du jeu
  * 
  */
 enum etat {gagnant,perdu,fin,jeu,menu};
-
+#define TIMER_BETWEEN_2_FRAMES 6
 #endif

@@ -4,5 +4,7 @@
         "sdl2-ttf-light.h": "c",
         "sdl_mixer.h": "c"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "editor.minimap.enabled": true,
+    "editor.minimap.size": "fit"
 }
