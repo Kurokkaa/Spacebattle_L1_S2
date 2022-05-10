@@ -146,6 +146,8 @@ void handle_mboss(world_t* world){
             world->missile.is_visible=0;
             world->mboss.life_points--;
             if(world->mboss.life_points==0){
+                set_invisible(&world->missile_mboss);
+                set_not_apply(&world->missile_mboss);
                 world->mboss.is_apply=0;
                 world->mboss.is_visible=0;
                 add_animation(world->mboss.x,world->mboss.y,world);
