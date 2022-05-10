@@ -49,6 +49,7 @@ struct ressources_s
     SDL_Texture* mini_boss_G;/*! Texture du boss qui va à gauche*/
     SDL_Texture* mini_boss_D;/*: Texture du boss qui va à droite*/
     audio_t sound;          /*!< Liste des sons */
+    SDL_Texture* missile_boss;
 };
 
 typedef struct ressources_s ressources_t;
