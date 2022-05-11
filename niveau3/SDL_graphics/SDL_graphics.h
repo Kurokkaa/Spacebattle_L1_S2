@@ -49,7 +49,7 @@ struct ressources_s
     SDL_Texture* mini_boss_G;/*!< Texture du boss qui va à gauche*/
     SDL_Texture* mini_boss_D;/*!< Texture du boss qui va à droite*/
     SDL_Texture* missile_boss; /*<Texture du missile que le boss tire*/
-    SDL_Texture* lose_background;
+    SDL_Texture* lose_background; 
 };
 
 typedef struct ressources_s ressources_t;

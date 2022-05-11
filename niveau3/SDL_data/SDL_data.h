@@ -38,7 +38,7 @@ struct sprite_s
     int is_visible; /*!<le sprite est-il visible */
     int is_apply;  /*!<le sprite est-il appliqué */
     int life_points; /*!<point de vie*/
-    int direction;
+    int direction; /*!<sens du boss*/
 };
 
 typedef struct sprite_s sprite_t;
