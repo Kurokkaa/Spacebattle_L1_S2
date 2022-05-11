@@ -2,7 +2,10 @@
     "files.associations": {
         "constantes.h": "c",
         "sdl2-ttf-light.h": "c",
-        "sdl_mixer.h": "c"
+        "sdl_mixer.h": "c",
+        "sdl_data.h": "c",
+        "sdl2-audio.h": "c",
+        "sdl_graphics.h": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "editor.minimap.enabled": true,

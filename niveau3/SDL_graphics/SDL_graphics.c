@@ -34,8 +34,9 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
  * @param renderer le renderer
  * @param world le monde du jeu
  * @param ressources les ressources
+ * @param audio la liste des sons
  */
-void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources){
+void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources,audio_t* audio){
     //tableau qui accueillera le score
     char number[15]; 
     
@@ -54,12 +55,14 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
             apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
             if(world->mboss.is_apply&&world->mboss.is_visible){
                  SDL_SetRenderDrawColor(renderer, 255, 0,0 ,255);
+                                    //--création de la barre de vie--//
                  SDL_Rect life_gauge;
                  life_gauge.x=SCREEN_WIDTH-50;
                  life_gauge.y=SCREEN_HEIGHT/2;
                  life_gauge.w=20;
                  life_gauge.h=-SCREEN_HEIGHT/3+(10-world->mboss.life_points)*SCREEN_HEIGHT/30; 
                  SDL_RenderFillRect(renderer,&life_gauge);
+                                    //--affichage du bon sprite selon la direction--//
                 if(world->mboss.direction==1){
                     apply_sprite(renderer,ressources->mini_boss_D,&(world->mboss));
                 }
@@ -69,9 +72,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
             }
             //Si le missile est appliqué dans le jeu on doit l'afficher
             if(world->missile.is_apply){ 
-
                 apply_sprite(renderer,ressources->missile,&world->missile);
-
             }
             apply_sprite(renderer,ressources->missile_boss,&world->missile_mboss);
                                     //---affichge des textes---//
@@ -82,7 +83,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
             draw_animation(world,ressources,renderer); //on affiche la liste des explosions
                                     //---gestion du son---//
             if(world->playable||!Mix_Playing(0)){   //lorsque qu'on passe sur le jeu la musique doit être changé 
-                play_music(0,ressources->sound.game_theme,0); //et on lance la musique du jeu
+                play_music(0,audio->game_theme,0); //et on lance la musique du jeu
                 world->playable=0;
 
             }
@@ -109,7 +110,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
         display_selection_zone(SCREEN_WIDTH/6-10,SCREEN_HEIGHT/2+world->menu_courant*45,SCREEN_WIDTH/2+65,50,renderer);
         apply_texture(ressources->menu_sprite,renderer,world->x_logo-SCREEN_WIDTH/4,SCREEN_HEIGHT/5);
         if(world->playable && !Mix_Playing(0)){ //on ne joue que la première fois qu'on arrive dans le jeu
-        play_music(0,ressources->sound.menu_theme,0); //on lance la musique du menu
+        play_music(0,audio->menu_theme,0); //on lance la musique du menu
         }
         break;
     }    
@@ -118,7 +119,6 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
 }
 /**
  * @brief crée un rectangle non rempli au coordonnées souhaité
- * 
  * @param x le x du point en haut à gauche du rectangle
  * @param y le y du point en haut à gauche du rectangle
  * @param w la largeur du rectangle
@@ -212,13 +212,15 @@ void draw_animation(world_t* world,ressources_t* ressources,SDL_Renderer* render
         else{
             world->explosion[i].frame_timer--; //sinon on décremente le compte à rebours;
         }
-    SDL_Rect SRC; //zone de capture dans la texture
-    SDL_Rect DEST; //zone de rendu 
+    //zone de capture dans la texture
+            SDL_Rect SRC; 
+    //zone de rendu
+            SDL_Rect DEST;  
     DEST.x=world->explosion[i].x;
     DEST.y=world->explosion[i].y;
     DEST.h=world->explosion[i].h;
     DEST.w=world->explosion[i].w;
-    /*chaque zone de la texture fais la même largeur donc,
+    /*chaque zone de la texture fait la même largeur donc,
      afin de trouver le x de la zone à capturer, 
      on multiplie la largeur d'une zone par le numéro de la frame
     */

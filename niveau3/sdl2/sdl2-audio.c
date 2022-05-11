@@ -53,6 +53,7 @@ void init_music(audio_t* sound){
     sound->enemy_destruction = load_music("ressources/audio/enemy_destruction.wav");
     sound->Game_over = load_music("ressources/audio/Game_over.wav");
     sound->game_theme = load_music("ressources/audio/game_theme.wav");
+    sound->menu_select = load_music("ressources/audio/menu_select.wav");
 }
 /**
  * @brief joue le son

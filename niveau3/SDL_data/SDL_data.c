@@ -11,6 +11,7 @@
 
 
 
+
 /**
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
@@ -40,12 +41,6 @@ void init_data(world_t * world){
        
 }
 
-void init_boss(sprite_t* boss,int x,int y,int w, int h,int v){
-    init_sprite(boss,x,y,w,h,v);
-    set_invisible(boss); //il est invisible au départ
-    boss->life_points=10;
-    boss->direction=1; //sens de déplacement du mini boss
-}
 
 /**
  * @brief afficher les données d'un sprite
@@ -79,8 +74,7 @@ void replace_missile(world_t* world){
     }
 }
 /**
- * @brief compte le nombre d'enemis tués
- * 
+ * @brief retourne la vague actuelle du jeu
  * @param world le monde du jeu
  */
 void set_wave(world_t* world){
@@ -88,7 +82,12 @@ void set_wave(world_t* world){
     
     
 }
-
+/**
+ * @brief retourne 0,1 ou 2 selon la vague actuelle
+ * 
+ * @param world 
+ * @return int 0,1 ou 2
+ */
 int check_wave(world_t* world){
     if (world->wave>=0 && world->wave<NB_WAVE/2 || world->wave>NB_WAVE/2 && world->wave<NB_WAVE){
         return 0;               //pas de boss
@@ -100,12 +99,34 @@ int check_wave(world_t* world){
         return 2;           
     }      //boss final
 }
+/**
+ * @brief initialise le sprite du boss
+ * @param boss le sprite du boss
+ * @param x le x de départ
+ * @param y le y de départ
+ * @param w la largeur du boss
+ * @param h la hauteur du boss
+ * @param v la vitesse horizontale du boss
+ */
+void init_boss(sprite_t* boss,int x,int y,int w, int h,int v){
+    init_sprite(boss,x,y,w,h,v);
+    set_invisible(boss); //il est invisible au départ
+    boss->life_points=10;
+    boss->direction=1; //sens de déplacement du mini boss
+}
+/**
+ * @brief gere le missile du boss intermédiaire
+ * @param world 
+ */
 void move_missile_mboss(world_t* world){
+    //si le projectile du boss intermédiaire est visible 
     if(get_is_visible(&(world->missile_mboss))){
+    //il est déplacé
     set_y(&(world->missile_mboss),get_y(&(world->missile_mboss))+MISSILE_SPEED); /*!< Si le missile est visible, c'est qu'il doit se déplacer */
     }
-    //sinon il est positionné au dessus du vaisseau 
+    //sinon il est placé au niveau de la tête du boss
     else{
+        //selon qu'il soit à droite ou gauche, le missile n'est pas placé au même endroit
         if(world->mboss.direction==1){
         set_x(&(world->missile_mboss),get_x(&(world->mboss))+120-MBOSS_MISSILE_SIZE/2); /*!< sinon il doit être placer au dessus du vaisseau*/
         set_y(&(world->missile_mboss),get_y(&(world->mboss))+MBOSS_SIZE);
@@ -117,13 +138,13 @@ void move_missile_mboss(world_t* world){
     }
 }
 void replace_missile_mboss(world_t* world){
+    //
     if(get_y(&(world->missile_mboss))>=SCREEN_HEIGHT){ 
         //on le cache afin de la replacer
         set_invisible(&(world->missile_mboss));  
     }
 }
-void handle_mboss(world_t* world){
-    world->mboss.is_visible=1;
+void move_mboss(world_t* world){
     if(world->mboss.x<=-MBOSS_SIZE){
         world->mboss.direction=1;
     }
@@ -137,44 +158,58 @@ void handle_mboss(world_t* world){
     else{
         world->mboss.x-=world->mboss.v;
     }
-     //s'il est visible il est donc lancé il doit monter en fonction de MISSILE_SPEED
-    move_missile_mboss(world);
-    replace_missile_mboss(world);
-    if(world->missile.is_visible){
-        if(sprites_collide(&(world->missile),&(world->mboss))){
-            world->missile.is_apply=0;
-            world->missile.is_visible=0;
-            world->mboss.life_points--;
-            if(world->mboss.life_points==0){
-                world->mboss.is_apply=0;
-                world->mboss.is_visible=0;
-                add_animation(world->mboss.x,world->mboss.y,world);
-            }       
-        }
-    }
-    if(sprites_collide(&world->missile_mboss,&world->ship)){
-        world->life--;
-        set_invisible(&world->missile_mboss);
-    }
+}
+void handle_shot_mboss(world_t* world){
     if(world->cooldown<=0){
         world->cooldown = 50;
         int shoot_chance = generate_number(1,101);
         if(shoot_chance>=1 && shoot_chance<=80 && world->mboss.x>=0 && world->mboss.x<=SCREEN_WIDTH-MBOSS_SIZE){
             set_visible(&world->missile_mboss);
-            printf("je tire!");
         }
     }
     else{
         world->cooldown--;
     }
+}
+/**
+ * @brief gestion du boss intermédiaire
+ * 
+ * @param world 
+ */
+void handle_mboss(world_t* world){
+    world->mboss.is_visible=1;
+    //on gére le déplacement du boss
+    move_mboss(world);
+    // on gére le missile du boss
+    move_missile_mboss(world);
+    replace_missile_mboss(world);
     
+    if(sprites_collide(&(world->missile),&(world->mboss))){
+        set_not_apply(&world->missile);
+        set_invisible(&world->missile);
+        world->mboss.life_points--;
+        //si le boss est mort, on l'enlève du jeu
+        if(world->mboss.life_points==0){
+            set_not_apply(&world->mboss);
+            set_invisible(&world->mboss);
+            set_not_apply(&world->missile_mboss);
+            set_invisible(&world->missile_mboss);
+            add_animation(world->mboss.x,world->mboss.y,world);
+        }       
+    }
+    //si le missile du boss nous touche on ne meurt pas mais on perd une vie
+    if(sprites_collide(&world->missile_mboss,&world->ship)){
+        world->life--;
+        set_invisible(&world->missile_mboss);
+    }
+    handle_shot_mboss(world);   
 }
 
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param les données du monde
  */
-void update_data(world_t *world){
+void update_data(world_t *world,audio_t* audio){
     int i;
     switch (world->state)
     {
@@ -185,17 +220,25 @@ void update_data(world_t *world){
         else world->x_logo+=3;
         break;
     case jeu:
+        //la vague actuelle est enregistré
         set_wave(world);
+        if(!world->ship.is_apply){
+            play_music(2,audio->death,0);
+        }
+        //si c'est la vague du boss
         if(check_wave(world)==1){
+            //on replace les ennemies restant en haut de l'écran à l'apparition du boss
             if(world->mboss.is_visible==0){
                 for (i=0;i<world->nb_enemies_left;i++){
                     world->enemies[NB_ENEMIES-world->nb_enemies_left+i].y=-(i*VERTICAL_DIST)-SHIP_SIZE;
                 }
+                // le boss apparait
                 set_visible(&(world->mboss));
             }
-            if(world->mboss.life_points<1){
+            //on gére le boss que s'il est en vie 
+            if(world->mboss.life_points<=0){
                 update_ennemies(world);
-                handle_ennemies(world);
+                handle_ennemies(world,audio);
             }
             else{
             handle_mboss(world);
@@ -207,7 +250,7 @@ void update_data(world_t *world){
         };*/
         if(check_wave(world)==0 || check_wave(world)==2){
             update_ennemies(world);
-            handle_ennemies(world);
+            handle_ennemies(world,audio);
         };
         replace_missile(world);
         move_missile(world);
@@ -216,6 +259,10 @@ void update_data(world_t *world){
         compute_game(world);
         break;
     case perdu:
+        if(!world->playable){
+            play_music(0,audio->Game_over,0);
+            world->playable=1;
+        }
         compute_game(world);
         break;
     case gagnant:
@@ -231,18 +278,18 @@ void update_data(world_t *world){
  * @brief gère la position des ennemies
  * @param world le monde du jeu
  */
-void handle_ennemies(world_t* world){
+void handle_ennemies(world_t* world,audio_t* audio){
     //si le vaisseau n'a pas été détruit
     if(get_is_apply(&(world->ship))){
         //on vérifie les collision avec les ennemis
         for(int i = 0; i<NB_ENEMIES;i++){
             //si l'ennemi n'a pas été détruit on vérifie la collison
             if(get_is_apply(&(world->enemies[i]))&&world->enemies[i].y>-SHIP_SIZE/2){
-                handle_sprites_collision(&(world->ship),&(world->enemies[i]),world);
+                handle_sprites_collision(&(world->ship),&(world->enemies[i]),world,audio);
                
                 //si le missile n'est pas visible il doit être ignoré
                 if(get_is_visible(&(world->missile))){
-                    handle_sprites_collision(&(world->missile),&(world->enemies[i]),world);
+                    handle_sprites_collision(&(world->missile),&(world->enemies[i]),world,audio);
                 }
             }
             //si le vaisseau enemi est en dehors de l'ecran
@@ -271,8 +318,8 @@ void move_missile(world_t* world){
     }
     //sinon il est positionné au dessus du vaisseau 
     else{
-        set_x(&(world->missile),get_x(&(world->ship))+SHIP_SIZE/2-MISSILE_SIZE/2); /*!< sinon il doit être placer au dessus du vaisseau*/
-        set_y(&(world->missile),get_y(&(world->ship))); /*!< sinon il doit être placer au dessus du vaisseau*/
+        set_x(&(world->missile),get_x(&(world->ship))+SHIP_SIZE/2-MISSILE_SIZE/2); 
+        set_y(&(world->missile),get_y(&(world->ship))); 
     }
 }
 
@@ -281,7 +328,7 @@ void move_missile(world_t* world){
  * \param event paramètre qui contient les événements
  * \param world les données du monde
  */
-void handle_events(SDL_Event *event,world_t *world){
+void handle_events(SDL_Event *event,world_t *world,audio_t* audio){
     Uint8 *keystates;
     while( SDL_PollEvent( event ) ) {
          //Si l'utilisateur a cliqué sur le X de la fenêtre
@@ -320,12 +367,14 @@ void handle_events(SDL_Event *event,world_t *world){
                             }
                             break;
                         case SDLK_DOWN:
+                            play_music(1,audio->menu_select,0);
                             world->menu_courant++;
                             if(world->menu_courant>2){
                                 world->menu_courant=0;
                             }
                             break;
                         case SDLK_UP:
+                            play_music(1,audio->menu_select,0);
                             if(world->menu_courant==0){
                                 world->menu_courant=2;
                             }
@@ -353,6 +402,7 @@ void handle_events(SDL_Event *event,world_t *world){
                         case SDLK_SPACE:
                             if(get_is_visible(&(world->ship))){ // on peut tirer seulement si le vaisseau est visible
                                 set_visible(&(world->missile));
+                                play_music(1,audio->missile_shot,0);
                             }
                             break;
                         case SDLK_ESCAPE:
@@ -423,14 +473,14 @@ int sprites_collide(sprite_t *sp2, sprite_t *sp1){
  * @param sp1 
  */
 
-void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
+void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world,audio_t* audio){
     if (sprites_collide(sp2,sp1)){
         sp1->is_visible=0; 
         sp2->is_visible=0;
         sp1->is_apply=0;
         sp2->is_apply=0;
         world->nb_enemies_left--;
-        printf("%d",world->wave);
+        play_music(2,audio->enemy_destruction,0);
         world->score++;
         add_animation(sp2->x,sp2->y,world);
         
@@ -438,7 +488,6 @@ void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t* world){
 }
 /**
  * @brief génère un nombre entre a et b
- * 
  * @param a 
  * @param b 
  * @return int 
@@ -448,7 +497,6 @@ int generate_number(int a, int b){
     }
 /**
  * @brief initialise les ennemies 
- * 
  * @param world 
  */   
 void init_ennemies(world_t* world){
@@ -483,7 +531,6 @@ void lose_life(world_t* world){
 }
 /**
  * @brief retourne 1 si l'etat = perdu,gagnant ou fin
- * 
  * @param world 
  */
 int CheckState(world_t* world){
@@ -491,7 +538,6 @@ int CheckState(world_t* world){
 }
 /**
  * @brief returne 1 si le nombre de vie égal à 0 sinon 0
- * 
  * @param world 
  * @return int 
  */
@@ -589,7 +635,6 @@ int get_x(sprite_t* sprite){
 }
 /**
  * @brief retourne la valeur de y
- * 
  * @param sprite 
  * @return int 
  */
@@ -598,7 +643,6 @@ int get_y(sprite_t* sprite){
 }
 /**
  * @brief retourne la valeur de h
- * 
  * @param sprite 
  * @return int 
  */

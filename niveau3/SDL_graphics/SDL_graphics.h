@@ -46,15 +46,15 @@ struct ressources_s
     SDL_Texture* quitter_menu; /*!< Texture du bouton quitter*/
     SDL_Texture* highscore_menu; /*:<Texture du bouton highscore dans le menu*/
     SDL_Texture* explosion; /*!< Texture de l'animation des explosions*/
-    SDL_Texture* mini_boss_G;/*! Texture du boss qui va à gauche*/
-    SDL_Texture* mini_boss_D;/*: Texture du boss qui va à droite*/
-    audio_t sound;          /*!< Liste des sons */
-    SDL_Texture* missile_boss;
+    SDL_Texture* mini_boss_G;/*!< Texture du boss qui va à gauche*/
+    SDL_Texture* mini_boss_D;/*!< Texture du boss qui va à droite*/
+    SDL_Texture* missile_boss; /*<Texture du missile que le boss tire*/
+    SDL_Texture* lose_background;
 };
 
 typedef struct ressources_s ressources_t;
 
-void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources);
+void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources,audio_t* audio);
 void apply_background(SDL_Renderer *renderer, ressources_t *ressources);
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite);
 void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t sprite[]);

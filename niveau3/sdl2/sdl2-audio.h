@@ -8,8 +8,8 @@
  * 
  */
 
-#ifndef __SDL2_MIXER__LIGHT__H__
-#define __SDL2_MIXER__LIGHT__H__
+#ifndef __SDL2_AUDIO__LIGHT__H__
+#define __SDL2_AUDIO__LIGHT__H__
 
 #include "..\..\SDL2-2.0.20\x86_64-w64-mingw32\include\SDL2\SDL_mixer.h"
 #include <stdio.h>
@@ -23,6 +23,7 @@ struct audio_s
     Mix_Chunk* enemy_destruction;
     Mix_Chunk* Game_over;
     Mix_Chunk* game_theme;
+    Mix_Chunk* menu_select;
     
 };
 

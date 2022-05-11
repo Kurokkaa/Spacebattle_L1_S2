@@ -57,23 +57,24 @@ void test_sprites_collide(){
 
 }
 
-void test_handle_sprites_collision_param(sprite_t *sp2, sprite_t *sp1, world_t* world){
+void test_handle_sprites_collision_param(sprite_t *sp2, sprite_t *sp1, world_t* world,audio_t* audio){
     printf("Vsp1 = %d, Vsp2= %d \n",sp1->v, sp2->v);
-    handle_sprites_collision(sp1,sp2,world);
+    handle_sprites_collision(sp1,sp2,world,audio);
 }
 
 void test_handle_sprites_collision(){
     sprite_t sp1;
     sprite_t sp2;
     world_t world;
+    audio_t audio;
     sp1.x=0;
     sp1.y=0; 
     sp2.x=0;
     sp2.y=0;
-    test_handle_sprites_collision_param(&sp1,&sp2,&world);
+    test_handle_sprites_collision_param(&sp1,&sp2,&world,&audio);
     sp2.x=0;
     sp2.y=SCREEN_HEIGHT;
-    test_handle_sprites_collision_param(&sp1,&sp2,&world);
+    test_handle_sprites_collision_param(&sp1,&sp2,&world,&audio);
 
 }
 void test_init_enemies_param(world_t* world){

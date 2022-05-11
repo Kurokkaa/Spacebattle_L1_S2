@@ -10,6 +10,7 @@
 #include "SDL_data/SDL_data.h"
 #include "SDL_graphics/SDL_graphics.h"
 #include "sdl2/sdl2-ttf-light.h"
+#include "sdl2/sdl2-audio.h"
 void clean_texture_textures_enemies(SDL_Texture** texture){
     int i;
     for(i=0;i<NB_ENEMIES;i++){
@@ -22,7 +23,7 @@ void clean_texture_textures_enemies(SDL_Texture** texture){
  * \brief La fonction nettoie les textures
  * \param ressources les ressources
 */
-void clean_ressources(ressources_t *ressources){
+void clean_ressources(ressources_t *ressources,audio_t* sound){
     clean_texture(ressources->background);
     clean_texture(ressources->skin_ship);
     clean_texture(ressources->missile);
@@ -37,7 +38,7 @@ void clean_ressources(ressources_t *ressources){
     clean_texture(ressources->highscore_menu);
     clean_texture(ressources->missile_boss);
     clean_texture_textures_enemies(ressources->skin_ennemy);
-    clean_audio(&(ressources->sound));
+    clean_audio(sound);
     clean_font(ressources->font);
     
 }
@@ -60,7 +61,7 @@ void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
  * @param renderer le renderer
  * @param ressources les ressources
  */
-void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
+void init_ressources(SDL_Renderer *renderer, ressources_t *ressources,audio_t* audio){
     ressources->background = load_image( "ressources/space-background.bmp",renderer);
     
     ressources->skin_ship = load_image("ressources/spaceship.bmp",renderer);
@@ -91,8 +92,9 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 
     ressources->missile_boss = load_image("ressources/missilemb.bmp",renderer);
 
+    ressources->lose_background = load_image("ressources/lose.bmp",renderer);
 
-    init_music(&(ressources->sound));
+    init_music(audio);
 }
 
 /**
@@ -102,8 +104,8 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources){
 * \param ressources les ressources
 * \param world le monde
 */
-void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world){
-    clean_ressources(ressources);
+void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources, world_t * world,audio_t* audio){
+    clean_ressources(ressources,audio);
     clean_sdl(renderer,window);
 }
 
@@ -115,12 +117,12 @@ void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources
  * @param ressources 
  * @param world 
  */
-void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world){
+void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world,audio_t* audio){
     init_data(world);
     init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
     init_ttf();
     init_audio();
-    init_ressources(*renderer,ressources);
+    init_ressources(*renderer,ressources,audio);
     
 }
 
@@ -137,28 +139,29 @@ int WinMain( int argc, char* args[] )
     ressources_t ressources;
     SDL_Renderer *renderer;
     SDL_Window *window;
+    audio_t audio;
 
     
     //initialisation du jeu
-    init(&window,&renderer,&ressources,&world);
+    init(&window,&renderer,&ressources,&world,&audio);
     
     
     while(!is_game_over(&world)){ //tant que le jeu n'est pas fini
        //mise à jour des données liée à la physique du monde
-        update_data(&world);
+        update_data(&world,&audio);
         
         //gestion des évènements
-        handle_events(&event,&world);
+        handle_events(&event,&world,&audio);
         
         //rafraichissement de l'écran
-        refresh_graphics(renderer,&world,&ressources);
+        refresh_graphics(renderer,&world,&ressources,&audio);
         // pause de 10 ms pour controler la vitesse de rafraichissement
         pause(10);
         
     }
     
     //nettoyage final
-    clean(window,renderer,&ressources,&world);
+    clean(window,renderer,&ressources,&world,&audio);
     
     
     return 0;
