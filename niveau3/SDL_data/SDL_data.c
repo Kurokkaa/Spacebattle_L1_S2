@@ -158,8 +158,32 @@ void move_mboss(world_t* world){
     else{
         world->mboss.x-=world->mboss.v;
     }
+<<<<<<< HEAD
 }
 void handle_shot_mboss(world_t* world){
+=======
+     //s'il est visible il est donc lancé il doit monter en fonction de MISSILE_SPEED
+    move_missile_mboss(world);
+    replace_missile_mboss(world);
+    if(world->missile.is_visible){
+        if(sprites_collide(&(world->missile),&(world->mboss))){
+            world->missile.is_apply=0;
+            world->missile.is_visible=0;
+            world->mboss.life_points--;
+            if(world->mboss.life_points==0){
+                set_invisible(&world->missile_mboss);
+                set_not_apply(&world->missile_mboss);
+                world->mboss.is_apply=0;
+                world->mboss.is_visible=0;
+                add_animation(world->mboss.x,world->mboss.y,world);
+            }       
+        }
+    }
+    if(sprites_collide(&world->missile_mboss,&world->ship)){
+        world->life--;
+        set_invisible(&world->missile_mboss);
+    }
+>>>>>>> cb2b7bcec2b3fac39296d7db3e514c1c4dd64e51
     if(world->cooldown<=0){
         world->cooldown = 50;
         int shoot_chance = generate_number(1,101);
