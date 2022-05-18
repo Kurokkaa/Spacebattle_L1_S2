@@ -20,10 +20,12 @@
 void init_data(world_t * world){
                 /*----------------------------------initialisation des sprites--------------------------------*/
     init_ennemies(world);
+    
     init_sprite(&(world->missile),SCREEN_WIDTH/2-MISSILE_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2+MISSILE_SIZE-SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, MISSILE_SPEED);
     init_sprite(&(world->ship), SCREEN_WIDTH/2-SHIP_SIZE/2, SCREEN_HEIGHT-3*SHIP_SIZE/2, SHIP_SIZE, SHIP_SIZE, 0);
     init_boss(&(world->mboss),0,-30,MBOSS_SIZE,MBOSS_SIZE-10,1);
-    init_sprite(&world->missile_mboss,30,MBOSS_SIZE,MISSILE_SIZE,MBOSS_MISSILE_SIZE,MISSILE_SPEED);    
+    init_boss(&(world->boss),0,0,BOSS_SIZE,BOSS_SIZE,0);
+    init_sprite(&world->missile_mboss,30,MBOSS_SIZE,MISSILE_SIZE,MBOSS_MISSILE_SIZE,MISSILE_SPEED); 
     set_invisible(&(world->missile));
     set_invisible(&(world->missile_mboss));
              /*---------------------------------------------------------------------------------------------*/
@@ -93,13 +95,13 @@ void set_wave(world_t* world){
  * @return int 0,1 ou 2
  */
 int check_wave(world_t* world){
-    if (world->wave <= 100 && world->wave >  50 || world->wave < 50 && world->wave > 0){
+    if (world->wave <= 0 && world->wave <  50 || world->wave > 50 && world->wave < 100){
         return 0;               //pas de boss
     }
     if (world->wave == 50){
         return 1;           //mini boss
     }
-    if (world->wave == 0){
+    if (world->wave == 100){
         return 2;           
     }      //boss final
 }
@@ -115,7 +117,7 @@ int check_wave(world_t* world){
 void init_boss(sprite_t* boss,int x,int y,int w, int h,int v){
     init_sprite(boss,x,y,w,h,v);
     set_invisible(boss); //il est invisible au départ
-    boss->life_points = 10;
+    boss->life_points = NB_BOSS_LIFE;
     boss->direction = 1; //sens de déplacement du mini boss
 }
 /**
@@ -220,7 +222,44 @@ void handle_mboss(world_t* world){
     handle_mboss_collision(world);
     handle_shot_mboss(world);   
 }
-
+void update_waves_boss(world_t* world){
+    int i;
+    for(i = 0 ; i<NB_BOSS_SBIRES;i++){
+        world->sbires[i].y+=world->sbires[i].v;
+    }
+}
+void handle_boss_collision(world_t* world){
+    if(sprites_collide(&(world->missile),&(world->boss))){
+        set_not_apply(&world->missile);
+        set_invisible(&world->missile);
+        world->boss.life_points--;
+        if(world->mboss.life_points==0){
+            set_not_apply(&(world->boss));
+            set_invisible(&(world->boss));
+            add_animation(world->mboss.x,world->mboss.y,world);
+            for(int i; i<NB_BOSS_SBIRES;i++){
+                set_invisible(&world->sbires[i]);
+            }
+        }   
+        //si le boss est mort, on l'enlève du jeu
+            
+    }
+}
+void handle_sbires_collision(world_t* world, audio_t* audio){
+    for(int i; i<NB_BOSS_SBIRES;i++){
+        if(world->sbires[i].is_apply){
+            handle_sprites_collision(&(world->ship),&(world->sbires[i]),world,audio);
+            if(world->missile.is_visible){
+                handle_sprites_collision(&(world->missile),&(world->sbires[i]),world,audio);
+            }
+        }
+    }
+}
+void handle_boss(world_t* world,audio_t* audio){
+    update_waves_boss(world); //gère la génération des ennemis
+    handle_boss_collision(world);
+    handle_sbires_collision(world,audio);
+}
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param les données du monde
@@ -241,23 +280,23 @@ void update_data(world_t *world,audio_t* audio){
         case jeu:
             if(!world->pause){
             //la vague actuelle est enregistré
-            set_wave(world);
-            if(!world->ship.is_apply){
-                play_music(2,audio->death,0);
-            }
+                set_wave(world);
+                if(!world->ship.is_apply){
+                    play_music(2,audio->death,0);
+                }
             //si c'est la vague du boss
-            if(check_wave(world) == 1){
+                if(check_wave(world) == 1){
                 //on replace les ennemies restant en haut de l'écran à l'apparition du boss
-                if(world->mboss.is_visible == 0){
-                    for (i = 0; i<NB_ENEMIES; i++){
-                         if(world->enemies[i].is_apply && world->enemies[i].is_visible){
-                             world->enemies[i].y = -(replace_coeff*VERTICAL_DIST)-SHIP_SIZE;
-                             replace_coeff++;
-                         }
+                    if(world->mboss.is_visible == 0){
+                        for (i = 0; i<NB_ENEMIES; i++){
+                             if(world->enemies[i].is_apply && world->enemies[i].is_visible){
+                                 world->enemies[i].y = -(replace_coeff*VERTICAL_DIST)-SHIP_SIZE;
+                                replace_coeff++;
+                            }
                          
-                    }
-                    // le boss apparait
-                    set_visible(&(world->mboss));
+                        }
+                        // le boss apparait
+                        set_visible(&(world->mboss));
                 }
                 //on gére le boss que s'il est en vie 
                 if(world->mboss.life_points <= 0){
@@ -266,13 +305,15 @@ void update_data(world_t *world,audio_t* audio){
                 }
                 else{
                 handle_mboss(world);
+                    }
                 }
-            
-            }
-        /* if(check_wave(world)==2){
-                update_boss(world);
-            };*/
-            if(check_wave(world) == 0 || check_wave(world) == 2){
+            if(check_wave(world)==2){
+                if(world->boss.is_visible){
+                handle_boss(world,audio);
+                }
+                set_visible(&world->boss);
+            };
+            if(check_wave(world) == 0){
                 update_ennemies(world);
                 handle_ennemies(world,audio);
             };
@@ -281,7 +322,8 @@ void update_data(world_t *world,audio_t* audio){
             left_limit(&(world->ship));
             right_limit(&(world->ship));
             compute_game(world);
-            }
+            
+        }
             break;
         case perdu:
             if(!world->playable){
@@ -548,11 +590,17 @@ void init_ennemies(world_t* world){
     int i;
     int x;
     int y;
-    world->enemies=(sprite_t*)malloc(sizeof(sprite_t)*NB_ENEMIES); 
+    world->enemies=(sprite_t*)malloc(sizeof(sprite_t)*NB_ENEMIES);
+    world->sbires =(sprite_t*)malloc(sizeof(sprite_t)*NB_BOSS_SBIRES);
     for(i = 0; i < NB_ENEMIES; i++){
         x = generate_number(0,SCREEN_WIDTH-SHIP_SIZE);
         y = -(SHIP_SIZE + i* VERTICAL_DIST);
         init_sprite(&(world->enemies[i]),x,y,SHIP_SIZE,SHIP_SIZE,ENEMY_SPEED);
+    }
+    for(i = 0; i < NB_ENEMIES; i++){
+        x = generate_number(0,SCREEN_WIDTH-SHIP_SIZE);
+        y = -(SHIP_SIZE + i* VERTICAL_DIST);
+        init_sprite(&(world->sbires[i]),x,y,SHIP_SIZE,SHIP_SIZE,BOSS_SBIRES_SPEED);
     }
 }
 /**
@@ -703,9 +751,9 @@ void write_new_best_score(world_t* world){
         printf("Erreur : %s",strerror(errno));
     }
     strcat(record, world->pseudo);
-    strcat(record,"/");
+    strcat(record,"\n");
     strcat(record, score);
-    strcat(record, "/");
+    strcat(record, "\n");
     fwrite(record,1,strlen(record), File);
 }
 /**
@@ -738,7 +786,7 @@ void compute_game(world_t* world){
                 world->state = perdu;
         }
         //sinon si tous les ennemis sont mort ou ont survécu
-         if(CheckEnemiesLeft(world)){
+         if(world->boss.life_points==0){
             //on regarde combien d'ennemis ont survécu
             //s'ils ont eté tous détruits
             if(CheckEnemiesSurvived(world)){

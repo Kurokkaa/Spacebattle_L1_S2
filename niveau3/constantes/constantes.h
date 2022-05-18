@@ -43,7 +43,7 @@
 /**
  * @brief vitesse verticale de l'ennemi
  */
-#define ENEMY_SPEED 2
+#define ENEMY_SPEED 1
 /**
  * @brief vitesse verticale du missile
  */
@@ -83,6 +83,17 @@ enum etat {gagnant,perdu,fin,jeu,menu,stop,saisie,highscore};
 /**
  * @brief nombre maximal de caractères pour le pseudonyme
  */
-#define SIZE_PSEUDO_MAX 10
+#define SIZE_PSEUDO_MAX 10 
+/**
+ * @brief taille du boss final
+ */
+#define BOSS_SIZE 245
+
+#define NB_BOSS_SBIRES 50
+
+#define BOSS_SBIRES_SPEED 2
+
+#define NB_BOSS_LIFE 10
+
 
 #endif

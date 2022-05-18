@@ -52,6 +52,9 @@ void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
     for(int i = 0;i<NB_ENEMIES;i++){
         ressources->skin_ennemy[i]=load_image("ressources/enemy.bmp",renderer);
     }
+    for(int i = 0;i<NB_BOSS_SBIRES;i++){
+        ressources->skin_boss_enemy[i]=load_image("ressources/enemy.bmp",renderer);
+    }
 }
 
 
@@ -93,6 +96,10 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources,audio_t* a
     ressources->missile_boss = load_image("ressources/missilemb.bmp",renderer);
 
     ressources->lose_background = load_image("ressources/lose.bmp",renderer);
+    
+    ressources->bossp1 = load_image("ressources/bossp1.bmp",renderer);
+
+    ressources->bossp2 = load_image("ressources/bossp2.bmp",renderer);
 
     init_music(audio);
 }

@@ -96,6 +96,8 @@ struct world_s
     sprite_t missile; /*<sprite du missile*/
     sprite_t mboss; /*<sprite du mini boss*/
     sprite_t missile_mboss;
+    sprite_t boss; /*sprite du boss*/
+    sprite_t* sbires; /*vaisseau envoyé du boss*/
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     int nb_enemies_survived; /*!< nombre d'ennemis survécu*/
     enum etat state; /*!< état du programme*/

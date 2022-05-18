@@ -37,6 +37,7 @@ struct ressources_s
     SDL_Texture* background; /*!< Texture liée à l'image du fond de l'écran. */
     SDL_Texture* skin_ship; /*!< Texture du vaisseau*/
     SDL_Texture* skin_ennemy[NB_ENEMIES]; /*!< Texture de l'ennemi*/
+    SDL_Texture* skin_boss_enemy[NB_BOSS_SBIRES];
     SDL_Texture* missile; /*!<Apparence du missile*/
     TTF_Font* font;  /*!< Police d'ecriture */
     SDL_Texture* menu_sprite; /*!<Texture du logo dans le menu*/
@@ -50,6 +51,8 @@ struct ressources_s
     SDL_Texture* mini_boss_D;/*!< Texture du boss qui va à droite*/
     SDL_Texture* missile_boss; /*<Texture du missile que le boss tire*/
     SDL_Texture* lose_background; 
+    SDL_Texture* bossp1;
+    SDL_Texture* bossp2;
 };
 
 typedef struct ressources_s ressources_t;

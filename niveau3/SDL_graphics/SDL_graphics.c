@@ -60,7 +60,6 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
             //display_rank(renderer,world,ressources);
             break;
         case saisie:
-            
             apply_text(renderer,SCREEN_WIDTH/2-100,SCREEN_HEIGHT/2-50,200,50,"ENTRER VOTRE PSEUDO",ressources->font); 
             apply_text(renderer,SCREEN_WIDTH/2-30,SCREEN_HEIGHT/2+50, 10*strlen(world->pseudo),50,world->pseudo, ressources->font);
             SDL_Rect line;
@@ -92,6 +91,17 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
                     apply_sprite(renderer,ressources->mini_boss_G,&(world->mboss));
                 }
             }
+            if(world->boss.is_apply&&world->boss.is_visible){
+                apply_sbires(renderer,ressources->skin_boss_enemy,world->sbires);
+                if(world->boss.life_points>NB_BOSS_LIFE/2){
+                    apply_sprite(renderer,ressources->bossp1,&world->boss);
+                }
+                else{
+                    apply_sprite(renderer,ressources->bossp2,&world->boss);
+                }
+                
+            }
+            
             
             //Si le missile est appliqué dans le jeu on doit l'afficher
             if(world->missile.is_apply){ 
@@ -196,7 +206,11 @@ void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t spri
     }
 }
 
-
+void apply_sbires(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t sprite[]){
+    for(int i = 0; i<NB_ENEMIES;i++){
+        apply_sprite(renderer,texture[i],&(sprite[i]));
+    }
+}
 /**
  * @brief on affiche les vie selon le nombre de vies restantes
  * 
