@@ -15,6 +15,8 @@
 #include <time.h>
 #include "..\sdl2\sdl2-ttf-light.h"
 #include "..\sdl2\sdl2-audio.h"
+#include <string.h>
+#include "sys/stat.h"
 
 /**
  * @brief representations des entités du jeu
@@ -67,6 +69,13 @@ struct animation_s
 
 typedef struct animation_s animation_t;
 
+struct highscore_s
+{
+    char pseudo[11];
+    char score[11]; 
+};
+
+typedef struct highscore_s highscore_t;
 /**
  * \brief Représentation du monde du jeu
  * \param ship le vaisseau du joueur 
@@ -99,8 +108,12 @@ struct world_s
     int playable; /*!<la musique doit-elle être joué*/
     animation_t explosion[10]; /*!<tableau qui stocke les animation de l'explosion*/
     int explosion_counter; /*!<nombres d'explosions*/
-    int wave;
-    int cooldown;
+    int wave;/*!<numéro de la vague actuelle*/
+    int mboss_shoot_cooldown;/*!<nombre d'itération avant la prochaine de tir du boss*/
+    int pause; /*!<variable qui gère la pause*/
+    char pseudo[SIZE_PSEUDO_MAX]; /*!chaine de caractères qui contiendra le pseudo du joueur*/
+    highscore_t* rank;
+    int nb_player;
 };
 
 typedef struct world_s world_t;
@@ -110,7 +123,7 @@ void print_sprite(sprite_t* sprite);
 void clean_data(world_t *world);
 int is_game_over(world_t *world);
 void update_data(world_t *world,audio_t* audio);
-void handle_events(SDL_Event *event,world_t *world,audio_t* audio);
+void handle_events(SDL_Event* event,world_t *world,audio_t* audio);
 void init_sprite(sprite_t *sprite, int x, int y, int w, int h, int v);
 void right_limit(sprite_t* sprite);
 void left_limit(sprite_t* sprite);
@@ -148,6 +161,9 @@ int check_wave(world_t* world);
 void init_boss(sprite_t* boss,int x,int y,int w, int h,int v);
 void move_missile_mboss(world_t* world);
 void replace_missile_mboss(world_t* world);
+void handle_mboss_collision(world_t* world);
 void handle_mboss(world_t* world);
 void move_mboss(world_t* world);
+void assign_new_highscore(world_t* world,highscore_t* highscore_array,int size);
+void read_highscore(world_t* world);
 #endif

@@ -57,7 +57,6 @@ void init_music(audio_t* sound){
 }
 /**
  * @brief joue le son
- * 
  * @param channel le canal sur lequelle le son doit être joué
  * @param music un pointeur vers le son
  * @param times le nombre de fois qu'il doit être rejouer, -1 s'il doit être jouer en boucle 

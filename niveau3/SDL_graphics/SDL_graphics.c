@@ -16,11 +16,11 @@
  * @param sprite les données de l'entité à afficher
  */
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite){
-    if(sprite->is_visible==1){ //si le sprite est visible on l'applique sinon 
+    if(sprite->is_visible == 1){ //si le sprite est visible on l'applique sinon 
         SDL_Rect dst = {0, 0, 0, 0};
     
         SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
-        dst.x = sprite->x; dst.y=sprite->y;
+        dst.x = sprite->x; dst.y = sprite->y;
         SDL_RenderCopy(renderer, texture, NULL, &dst);
     }
     //si le vaisseau n'est ni affiché ni appliqué la texture est nettoyé
@@ -28,7 +28,14 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
         clean_texture(texture);
     }
 }
-
+void display_rank(SDL_Renderer* renderer, world_t* world,ressources_t* ressources){
+    char score[15];
+    for(int i=0; i < world->nb_player; i++){
+        sprintf(score,"%d",world->rank[i].score);
+        apply_text(renderer, 0, 150+i*20,SCREEN_WIDTH/2,50,world->rank[i].pseudo,ressources->font);
+        apply_text(renderer, SCREEN_WIDTH/2, 170+i*0, SCREEN_WIDTH/4,50,score,ressources->font);
+    }
+}
 /**
  * @brief met à jour le renderer
  * @param renderer le renderer
@@ -48,17 +55,32 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
     
     //on change l'affichage selon l'etat du jeu
     switch (world->state)  
-    {
+    {   case highscore:
+            apply_texture(ressources->highscore_menu,renderer, SCREEN_WIDTH/4, 100);
+            //display_rank(renderer,world,ressources);
+            break;
+        case saisie:
+            
+            apply_text(renderer,SCREEN_WIDTH/2-100,SCREEN_HEIGHT/2-50,200,50,"ENTRER VOTRE PSEUDO",ressources->font); 
+            apply_text(renderer,SCREEN_WIDTH/2-30,SCREEN_HEIGHT/2+50, 10*strlen(world->pseudo),50,world->pseudo, ressources->font);
+            SDL_Rect line;
+            line.x=0;
+            line.y=SCREEN_HEIGHT-150;
+            line.w=SCREEN_WIDTH;
+            line.h=1;
+            SDL_RenderFillRect(renderer,&line);
+            break;
+        
         case jeu: 
                                     //---affichage des entités---//
             apply_sprite(renderer,ressources->skin_ship,&(world->ship));
             apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
-            if(world->mboss.is_apply&&world->mboss.is_visible){
+            if(world->mboss.is_apply&&world->mboss.is_visible)  {
                  SDL_SetRenderDrawColor(renderer, 255, 0,0 ,255);
                                     //--création de la barre de vie--//
                  SDL_Rect life_gauge;
-                 life_gauge.x=SCREEN_WIDTH-50;
-                 life_gauge.y=SCREEN_HEIGHT/2;
+                 life_gauge.x=SCREEN_WIDTH-20;
+                 life_gauge.y=SCREEN_HEIGHT/2-30;
                  life_gauge.w=20;
                  life_gauge.h=-SCREEN_HEIGHT/3+(10-world->mboss.life_points)*SCREEN_HEIGHT/30; 
                  SDL_RenderFillRect(renderer,&life_gauge);
@@ -70,50 +92,57 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
                     apply_sprite(renderer,ressources->mini_boss_G,&(world->mboss));
                 }
             }
+            
             //Si le missile est appliqué dans le jeu on doit l'afficher
             if(world->missile.is_apply){ 
                 apply_sprite(renderer,ressources->missile,&world->missile);
             }
             apply_sprite(renderer,ressources->missile_boss,&world->missile_mboss);
                                     //---affichge des textes---//
-            apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
+            apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score:",ressources->font);
             apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
                                     //---affichage des animations---//
             display_life(renderer,ressources,world); //on affiche les vies
             draw_animation(world,ressources,renderer); //on affiche la liste des explosions
                                     //---gestion du son---//
-            if(world->playable||!Mix_Playing(0)){   //lorsque qu'on passe sur le jeu la musique doit être changé 
-                play_music(0,audio->game_theme,0); //et on lance la musique du jeu
-                world->playable=0;
 
+                                    //si la pause est activé//
+            if(world->pause){
+                //blend mode pour gérer la transparence
+                SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+                //Couleur noire avec une opacité de 50%
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 90);
+                SDL_RenderFillRect(renderer,NULL);
+                apply_text(renderer,50,150,200,100,"PAUSE",ressources->font);
             }
             break;
-    case gagnant:
-        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",ressources->font);
-        apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/6,40, "score;",ressources->font);
-        apply_text(renderer,SCREEN_WIDTH/3 + SCREEN_WIDTH/6 ,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/15,40,number,ressources->font);
-        break;
-    case perdu:
-        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",ressources->font);
-        apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
-        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
-        break;
-    case fin:
-        apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"Game Over ! ",ressources->font);
-        apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
-        apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
-        break;
-    case menu: 
-        apply_texture(ressources->solo_menu,renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+15);
-        apply_texture(ressources->highscore_menu,renderer,SCREEN_WIDTH/6,SCREEN_HEIGHT/2+60);
-        apply_texture(ressources->quitter_menu,renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/2+110);
-        display_selection_zone(SCREEN_WIDTH/6-10,SCREEN_HEIGHT/2+world->menu_courant*45,SCREEN_WIDTH/2+65,50,renderer);
-        apply_texture(ressources->menu_sprite,renderer,world->x_logo-SCREEN_WIDTH/4,SCREEN_HEIGHT/5);
-        if(world->playable && !Mix_Playing(0)){ //on ne joue que la première fois qu'on arrive dans le jeu
-        play_music(0,audio->menu_theme,0); //on lance la musique du menu
-        }
-        break;
-    }    
+        case gagnant:
+            apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"congratulation ! ",ressources->font);
+            apply_text(renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/6,40, "score;",ressources->font);
+            apply_text(renderer,SCREEN_WIDTH/3 + SCREEN_WIDTH/6 ,SCREEN_HEIGHT/2-SCREEN_HEIGHT/8,SCREEN_WIDTH/15,40,number,ressources->font);
+            break;
+        case perdu:
+            apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"You Lose ! ",ressources->font);
+            apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
+            apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
+            break;
+        case fin:
+            apply_text(renderer,SCREEN_WIDTH/2-SCREEN_WIDTH/7,SCREEN_HEIGHT/2,SCREEN_WIDTH/3,40,"Game Over ! ",ressources->font);
+            apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score;",ressources->font);
+            apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
+            break;
+        case menu: 
+            apply_texture(ressources->solo_menu,renderer,SCREEN_WIDTH/3,SCREEN_HEIGHT/2+15);
+            apply_texture(ressources->highscore_menu,renderer,SCREEN_WIDTH/6,SCREEN_HEIGHT/2+60);
+            apply_texture(ressources->quitter_menu,renderer,SCREEN_WIDTH/4,SCREEN_HEIGHT/2+110);
+            display_selection_zone(SCREEN_WIDTH/6-10,SCREEN_HEIGHT/2+world->menu_courant*45,SCREEN_WIDTH/2+65,50,renderer);
+            apply_texture(ressources->menu_sprite,renderer,world->x_logo-SCREEN_WIDTH/4,SCREEN_HEIGHT/5);
+            if(!Mix_Playing(0)){ //on ne joue que la première fois qu'on arrive dans le jeu
+            play_music(0,audio->menu_theme,-1); //on lance la musique du menu
+            }
+            break;
+        
+    }   
     // on met à jour l'écran
     update_screen(renderer);
 }

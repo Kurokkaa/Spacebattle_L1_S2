@@ -43,7 +43,7 @@
 /**
  * @brief vitesse verticale de l'ennemi
  */
-#define ENEMY_SPEED 1
+#define ENEMY_SPEED 2
 /**
  * @brief vitesse verticale du missile
  */
@@ -74,8 +74,15 @@
 #define NB_WAVE 10
 /**
  * @brief énumeration afin de gérer les différents états du jeu
- * 
  */
-enum etat {gagnant,perdu,fin,jeu,menu};
+enum etat {gagnant,perdu,fin,jeu,menu,stop,saisie,highscore};
+/**
+ * @brief frame rate de l'animation
+ */
 #define TIMER_BETWEEN_2_FRAMES 6
+/**
+ * @brief nombre maximal de caractères pour le pseudonyme
+ */
+#define SIZE_PSEUDO_MAX 10
+
 #endif

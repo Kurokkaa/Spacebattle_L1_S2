@@ -54,6 +54,8 @@ struct ressources_s
 
 typedef struct ressources_s ressources_t;
 
+
+
 void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *ressources,audio_t* audio);
 void apply_background(SDL_Renderer *renderer, ressources_t *ressources);
 void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite);
