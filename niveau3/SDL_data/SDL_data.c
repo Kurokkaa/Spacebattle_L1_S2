@@ -101,7 +101,7 @@ int check_wave(world_t* world){
     if (world->wave == 50){
         return 1;           //mini boss
     }
-    if (world->wave == 100){
+    if (world->wave >= 100){
         return 2;           
     }      //boss final
 }
@@ -233,7 +233,8 @@ void handle_boss_collision(world_t* world){
         set_not_apply(&world->missile);
         set_invisible(&world->missile);
         world->boss.life_points--;
-        if(world->mboss.life_points==0){
+        if(world->boss.life_points==0){
+            printf("le boss est mort");
             set_not_apply(&(world->boss));
             set_invisible(&(world->boss));
             add_animation(world->mboss.x,world->mboss.y,world);
@@ -247,7 +248,7 @@ void handle_boss_collision(world_t* world){
 }
 void handle_sbires_collision(world_t* world, audio_t* audio){
     for(int i; i<NB_BOSS_SBIRES;i++){
-        if(world->sbires[i].is_apply){
+        if(world->sbires[i].is_apply&&world->sbires[i].y>-SHIP_SIZE/2){
             handle_sprites_collision(&(world->ship),&(world->sbires[i]),world,audio);
             if(world->missile.is_visible){
                 handle_sprites_collision(&(world->missile),&(world->sbires[i]),world,audio);
@@ -786,7 +787,7 @@ void compute_game(world_t* world){
                 world->state = perdu;
         }
         //sinon si tous les ennemis sont mort ou ont survécu
-         if(world->boss.life_points==0){
+         if(!world->boss.is_apply&&!world->boss.is_visible){
             //on regarde combien d'ennemis ont survécu
             //s'ils ont eté tous détruits
             if(CheckEnemiesSurvived(world)){

@@ -72,7 +72,7 @@ typedef struct animation_s animation_t;
 struct highscore_s
 {
     char pseudo[11];
-    char score[11]; 
+    char score[100]; 
 };
 
 typedef struct highscore_s highscore_t;
