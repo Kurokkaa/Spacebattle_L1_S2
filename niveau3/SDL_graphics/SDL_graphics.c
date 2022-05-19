@@ -29,13 +29,11 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
     }
 }
 void display_rank(SDL_Renderer* renderer, world_t* world,ressources_t* ressources){
-    char score[15];
     for(int i=0; i < world->nb_player; i++){
-        sprintf(score,"%d",world->rank[i].score);
-        apply_text(renderer, 0, 150+i*20,SCREEN_WIDTH/2,50,world->rank[i].pseudo,ressources->font);
-        apply_text(renderer, SCREEN_WIDTH/2, 170+i*0, SCREEN_WIDTH/4,50,score,ressources->font);
-    }
-}
+        apply_text(renderer, 40, 150+i*40,SCREEN_WIDTH/4,40,world->rank[i].pseudo,ressources->font);
+        apply_text(renderer, 170, 150+i*40, SCREEN_WIDTH/4,40,world->rank[i].score,ressources->font);
+    }}
+    
 /**
  * @brief met à jour le renderer
  * @param renderer le renderer
@@ -56,8 +54,8 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
     //on change l'affichage selon l'etat du jeu
     switch (world->state)  
     {   case highscore:
-            apply_texture(ressources->highscore_menu,renderer, SCREEN_WIDTH/4, 100);
-            //display_rank(renderer,world,ressources);
+            apply_texture(ressources->highscore_menu,renderer, 45, 80);
+            display_rank(renderer,world,ressources);
             break;
         case saisie:
             apply_text(renderer,SCREEN_WIDTH/2-100,SCREEN_HEIGHT/2-50,200,50,"ENTRER VOTRE PSEUDO",ressources->font); 

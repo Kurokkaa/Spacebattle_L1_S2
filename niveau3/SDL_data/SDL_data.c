@@ -101,7 +101,7 @@ int check_wave(world_t* world){
     if (world->wave == 50){
         return 1;           //mini boss
     }
-    if (world->wave == 100){
+    if (world->wave >= 100){
         return 2;           
     }      //boss final
 }
@@ -233,10 +233,10 @@ void handle_boss_collision(world_t* world){
         set_not_apply(&world->missile);
         set_invisible(&world->missile);
         world->boss.life_points--;
-        if(world->mboss.life_points==0){
+        if(world->boss.life_points==0){
             set_not_apply(&(world->boss));
             set_invisible(&(world->boss));
-            add_animation(world->mboss.x,world->mboss.y,world);
+            add_animation(world->boss.x,world->boss.y,world);
             for(int i; i<NB_BOSS_SBIRES;i++){
                 set_invisible(&world->sbires[i]);
             }
@@ -247,13 +247,20 @@ void handle_boss_collision(world_t* world){
 }
 void handle_sbires_collision(world_t* world, audio_t* audio){
     for(int i; i<NB_BOSS_SBIRES;i++){
-        if(world->sbires[i].is_apply){
+        if(world->sbires[i].is_apply&&world->sbires[i].y>=-SHIP_SIZE/2){
             handle_sprites_collision(&(world->ship),&(world->sbires[i]),world,audio);
             if(world->missile.is_visible){
                 handle_sprites_collision(&(world->missile),&(world->sbires[i]),world,audio);
             }
         }
     }
+     if(get_y(&(world->enemies[i])) >= SCREEN_HEIGHT && world->enemies[i].is_apply){
+                set_not_apply(&(world->enemies[i]));
+                set_invisible(&(world->enemies[i]));
+                world->nb_enemies_survived++;
+                world->nb_enemies_left--;
+                lose_life(world);
+            }
 }
 void handle_boss(world_t* world,audio_t* audio){
     update_waves_boss(world); //gère la génération des ennemis
@@ -311,7 +318,10 @@ void update_data(world_t *world,audio_t* audio){
                 if(world->boss.is_visible){
                 handle_boss(world,audio);
                 }
-                set_visible(&world->boss);
+                else{
+                    set_visible(&world->boss);
+                }
+                
             };
             if(check_wave(world) == 0){
                 update_ennemies(world);
@@ -654,35 +664,42 @@ int CheckEnemiesLeft(world_t* world){
 int CheckEnemiesSurvived(world_t* world){
     return world->nb_enemies_survived == 0;
 }
-void assign_new_highscore(world_t* world, highscore_t highscore_array[], int size){
-    
+
+/**
+ * @brief trie par ordre croissant le tableau des scores
+ * @param array 
+ * @param size 
+ */
+void ascending_highscore_array_sort(highscore_t* array,int size){
     highscore_t tmp;
-    int tableau_trie;
-    int k=1;
-    for(int i = size-1; i > 0;i--){
-        tableau_trie=1;
-        for(int j = 0; j < i; j++){
-            if(atoi(highscore_array[j+1].score) > atoi(highscore_array[j].score)){
-                tableau_trie=0;
-                tmp=highscore_array[j+1];
-                highscore_array[j+1] = highscore_array[j];
-                highscore_array[j] = tmp;
-            }
-            if(tableau_trie){
-                i=0;
+    for(int i=size;i>1;i--){
+        for(int j=0;j<i;j++){
+            if(atoi(array[j+1].score)>atoi(array[j].score)){
+                tmp=array[j];
+                array[j]=array[j+1];
+                array[j+1]=tmp;
             }
         }
     }
-    
-    
-    for(int i = 0; i<world->nb_player; i++){
-        world->rank[i] = highscore_array[i];
-    }
-    
-    
 }
 /**
- * @brief
+ * @brief ajoute au tableau les 10 premiers scores en enlevant les doublon
+ * @param rank le tableau qui recoit les scores
+ * @param orderded_array le tableau trié
+ */
+void assign_new_highscore(highscore_t* rank,highscore_t* orderded_array,int size){
+    int k=1;
+    rank[0]=orderded_array[0];
+    for(int i=1;i<size&&k<10;i++){
+        if(orderded_array[i].score!=rank[k-1].score){
+            rank[k]=orderded_array[i];
+            k++;
+        }
+    }
+}
+
+/**
+ * @brief récupere les scores contenu dans leur fichier et les inscrits dans un tableau contenu dans world
  * @param world 
  */
 void read_highscore(world_t* world){
@@ -694,9 +711,6 @@ void read_highscore(world_t* world){
     char* File_name = "SDL_data/Highscore_board.txt";
     struct stat stat_file;
     FILE* file = fopen(File_name,"r"); //ouverture en mode lecture
-    if(file==NULL){
-        printf("erreur");
-    }
     stat(File_name, &stat_file);
     long long size = stat_file.st_size;
     char score[size+1];
@@ -714,7 +728,6 @@ void read_highscore(world_t* world){
     else{
         world->nb_player=10;
     }
-    printf("%d",world->nb_player);
     highscore_t* highscore_table = malloc(sizeof(highscore_t)*array_size);
    for(i = 0; i < size; i++){
         if(score[i]!='\n'){
@@ -729,12 +742,20 @@ void read_highscore(world_t* world){
         }
         else{
             if(locations){
+                highscore_table[k].score[j+1]='\0';
                 k++; 
+            }
+            else{
+                highscore_table[k].pseudo[j+1]='\0';
             }
             locations=1-locations;
             j=0;
         }
     }
+    ascending_highscore_array_sort(highscore_table,array_size);
+    assign_new_highscore(world->rank,highscore_table,world->nb_player);
+    
+    free(highscore_table);
     fclose(file);
 }
     

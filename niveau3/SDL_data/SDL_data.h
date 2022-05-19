@@ -71,8 +71,8 @@ typedef struct animation_s animation_t;
 
 struct highscore_s
 {
-    char pseudo[11];
-    char score[11]; 
+    char pseudo[30];
+    char score[30]; 
 };
 
 typedef struct highscore_s highscore_t;
@@ -166,6 +166,6 @@ void replace_missile_mboss(world_t* world);
 void handle_mboss_collision(world_t* world);
 void handle_mboss(world_t* world);
 void move_mboss(world_t* world);
-void assign_new_highscore(world_t* world,highscore_t* highscore_array,int size);
+void assign_new_highscore(highscore_t* array,highscore_t* orderer_array,int size);
 void read_highscore(world_t* world);
 #endif
