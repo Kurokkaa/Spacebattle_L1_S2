@@ -71,8 +71,8 @@ typedef struct animation_s animation_t;
 
 struct highscore_s
 {
-    char pseudo[30];
-    char score[30]; 
+    char pseudo[11];
+    char score[11]; 
 };
 
 typedef struct highscore_s highscore_t;
@@ -81,6 +81,11 @@ typedef struct highscore_s highscore_t;
  * \param ship le vaisseau du joueur 
  * \param enemies le tableau de tous les ennemies
  * \param missile le sprite du missile
+ * \param mboss le boss intermediaire
+ * \param missile_mboss le missile du boss intermediaire
+ * \param boss le boss final
+ * \param sbires les ennemies qui spawn avec le boss
+ * \param missile_boss le missile du boss
  * \param gameover le programme est-il terminer
  * \param nb_enemies_survived nombre d'ennemi ayant survécu
  * \param state l'etat du programme
@@ -88,16 +93,29 @@ typedef struct highscore_s highscore_t;
  * \param score score du joueur
  * \param timer_end timer de fermeture de la fenêtre
  * \param life nombre de vie du vaisseau
+ * \param menu_courant position dans le menu
+ * \param x_logo abscysse du logo du menu
+ * \param playable entier qui gère la possibilité de jouer une musique
+ * \param explosion tableau qui recevra la liste des animation d'explosions
+ * \param explosion_counter nombre d'explosion en jeu
+ * \param wave pourcentage d'ennemi tuée ou survécu 
+ * \param mboss_shoot_cooldown délai entre deux tirs du mid boss
+ * \param pause variable afin de mettre le jeu en pause
+ * \param pseudo tableau qui recoit le pseudo du joueur
+ * \param rank classement des joueurs
+ * \param nb_player nombre de joueur dans le classement
+ * \param boss_shoot_cooldown délai entre deux tir du boss
 */
 struct world_s
 {
     sprite_t ship; /*!<sprite du vaisseau du joueur*/
-    sprite_t* enemies; /*!<tableau de sprite_t représentant les ennemies*/
+    sprite_t enemies[NB_ENEMIES]; /*!<tableau de sprite_t représentant les ennemies*/
     sprite_t missile; /*<sprite du missile*/
     sprite_t mboss; /*<sprite du mini boss*/
-    sprite_t missile_mboss;
+    sprite_t missile_mboss; /*<sprite du missile du boss intermediare*/
     sprite_t boss; /*sprite du boss*/
-    sprite_t* sbires; /*vaisseau envoyé du boss*/
+    sprite_t sbires[NB_SBIRES]; /*vaisseau envoyé du boss*/
+    sprite_t missile_boss[NB_MISSILES]; /*<sprite du missile du boss */
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     int nb_enemies_survived; /*!< nombre d'ennemis survécu*/
     enum etat state; /*!< état du programme*/
@@ -110,12 +128,14 @@ struct world_s
     int playable; /*!<la musique doit-elle être joué*/
     animation_t explosion[10]; /*!<tableau qui stocke les animation de l'explosion*/
     int explosion_counter; /*!<nombres d'explosions*/
-    int wave;/*!<numéro de la vague actuelle*/
+    int wave;/*!<pourcentage d'ennemi tués ou survécus*/
     int mboss_shoot_cooldown;/*!<nombre d'itération avant la prochaine de tir du boss*/
     int pause; /*!<variable qui gère la pause*/
-    char pseudo[SIZE_PSEUDO_MAX]; /*!chaine de caractères qui contiendra le pseudo du joueur*/
-    highscore_t* rank;
-    int nb_player;
+    char pseudo[SIZE_PSEUDO_MAX]; /*!<chaine de caractères qui contiendra le pseudo du joueur*/
+    highscore_t rank[10]; /*!<tableau qui va recevoir le classement une fois trié*/
+    int nb_player; /*le nombre de joueur inscrit dans le classement*/
+    int boss_shoot_cooldown; /*le délai entre tir du boss*/
+    sprite_t vie[NB_ENEMIES];
 };
 
 typedef struct world_s world_t;
@@ -166,6 +186,7 @@ void replace_missile_mboss(world_t* world);
 void handle_mboss_collision(world_t* world);
 void handle_mboss(world_t* world);
 void move_mboss(world_t* world);
-void assign_new_highscore(highscore_t* array,highscore_t* orderer_array,int size);
+void assign_new_highscore(highscore_t* rank,highscore_t* orderded_array,int size,world_t* world);
 void read_highscore(world_t* world);
+void ascending_highscore_array_sort(highscore_t* array,int size);
 #endif

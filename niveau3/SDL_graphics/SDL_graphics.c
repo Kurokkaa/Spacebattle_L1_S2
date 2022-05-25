@@ -28,11 +28,23 @@ void apply_sprite(SDL_Renderer* renderer, SDL_Texture* texture, sprite_t* sprite
         clean_texture(texture);
     }
 }
+/**
+ * @brief affiche le classement
+ * 
+ * @param renderer 
+ * @param world 
+ * @param ressources 
+ */
 void display_rank(SDL_Renderer* renderer, world_t* world,ressources_t* ressources){
+    char number[3];
     for(int i=0; i < world->nb_player; i++){
-        apply_text(renderer, 40, 150+i*40,SCREEN_WIDTH/4,40,world->rank[i].pseudo,ressources->font);
-        apply_text(renderer, 170, 150+i*40, SCREEN_WIDTH/4,40,world->rank[i].score,ressources->font);
-    }}
+        sprintf(number,"%d",i+1);
+        apply_text(renderer, 60, 150+i*30,SCREEN_WIDTH/4,25,world->rank[i].pseudo,ressources->font);
+        apply_text(renderer, 190, 150+i*30,SCREEN_WIDTH/4,30,world->rank[i].score,ressources->font);
+        apply_text(renderer, 25, 150+i*30, 15,30,number,ressources->font);
+        
+    }
+}
     
 /**
  * @brief met à jour le renderer
@@ -67,11 +79,13 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
             line.h=1;
             SDL_RenderFillRect(renderer,&line);
             break;
-        
         case jeu: 
                                     //---affichage des entités---//
             apply_sprite(renderer,ressources->skin_ship,&(world->ship));
             apply_enemies(renderer,ressources->skin_ennemy,world->enemies);
+            for(int i=0;i<NB_ENEMIES;i++){
+                apply_sprite(renderer,ressources->life_texture[i],world->life);
+            }
             if(world->mboss.is_apply&&world->mboss.is_visible)  {
                  SDL_SetRenderDrawColor(renderer, 255, 0,0 ,255);
                                     //--création de la barre de vie--//
@@ -89,23 +103,33 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world,ressources_t *resso
                     apply_sprite(renderer,ressources->mini_boss_G,&(world->mboss));
                 }
             }
-            if(world->boss.is_apply&&world->boss.is_visible){
-                apply_sbires(renderer,ressources->skin_boss_enemy,world->sbires);
+            if(world->boss.is_apply&&world->boss.is_visible){    
                 if(world->boss.life_points>NB_BOSS_LIFE/2){
                     apply_sprite(renderer,ressources->bossp1,&world->boss);
+                    
                 }
                 else{
                     apply_sprite(renderer,ressources->bossp2,&world->boss);
+                    for(int i ; i<3;i++){
+                        apply_sprite(renderer,ressources->missile_boss,&(world->missile_boss[i]));
+                    }
+                    
                 }
-                
+                apply_sbires(renderer,ressources->skin_boss_enemy,world->sbires);
+                 SDL_Rect life_gauge;
+                 life_gauge.x=SCREEN_WIDTH-20;
+                 life_gauge.y=SCREEN_HEIGHT/2-30;
+                 life_gauge.w=20;
+                 life_gauge.h=-SCREEN_HEIGHT/3+(10-world->boss.life_points)*SCREEN_HEIGHT/30; 
+                 SDL_RenderFillRect(renderer,&life_gauge);
             }
-            
             
             //Si le missile est appliqué dans le jeu on doit l'afficher
             if(world->missile.is_apply){ 
                 apply_sprite(renderer,ressources->missile,&world->missile);
             }
-            apply_sprite(renderer,ressources->missile_boss,&world->missile_mboss);
+            apply_sprite(renderer,ressources->missile_mboss,&world->missile_mboss);
+            
                                     //---affichge des textes---//
             apply_text(renderer,0,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/6,40, "score:",ressources->font);
             apply_text(renderer,SCREEN_WIDTH/6+2,3*SCREEN_HEIGHT/4,SCREEN_WIDTH/15,40,number,ressources->font);
@@ -203,9 +227,15 @@ void apply_enemies(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t spri
         apply_sprite(renderer,texture[i],&(sprite[i]));
     }
 }
-
+/**
+ * @brief appliques les sbires du boss
+ * 
+ * @param renderer 
+ * @param texture 
+ * @param sprite 
+ */
 void apply_sbires(SDL_Renderer* renderer, SDL_Texture* texture[], sprite_t sprite[]){
-    for(int i = 0; i<NB_ENEMIES;i++){
+    for(int i = 0; i<NB_SBIRES;i++){
         apply_sprite(renderer,texture[i],&(sprite[i]));
     }
 }
@@ -254,22 +284,22 @@ void draw_animation(world_t* world,ressources_t* ressources,SDL_Renderer* render
             world->explosion[i].frame_timer--; //sinon on décremente le compte à rebours;
         }
     //zone de capture dans la texture
-            SDL_Rect SRC; 
+        SDL_Rect SRC; 
     //zone de rendu
-            SDL_Rect DEST;  
-    DEST.x=world->explosion[i].x;
-    DEST.y=world->explosion[i].y;
-    DEST.h=world->explosion[i].h;
-    DEST.w=world->explosion[i].w;
-    /*chaque zone de la texture fait la même largeur donc,
-     afin de trouver le x de la zone à capturer, 
-     on multiplie la largeur d'une zone par le numéro de la frame
-    */
-    SRC.x=world->explosion[i].frame_number * world->explosion[i].w; 
-    SRC.y=0;
-    SRC.h=world->explosion[i].h;
-    SRC.w=world->explosion[i].w;
-    //on affiche la sélection dans la zone de l'ennemi
-    SDL_RenderCopy(renderer,ressources->explosion,&SRC,&DEST);
-}
+        SDL_Rect DEST;  
+        DEST.x=world->explosion[i].x;
+        DEST.y=world->explosion[i].y;
+        DEST.h=world->explosion[i].h;
+        DEST.w=world->explosion[i].w;
+        /*chaque zone de la texture fait la même largeur donc,
+        afin de trouver le x de la zone à capturer, 
+        on multiplie la largeur d'une zone par le numéro de la frame
+        */
+        SRC.x=world->explosion[i].frame_number * world->explosion[i].w; 
+        SRC.y=0;
+        SRC.h=world->explosion[i].h;
+        SRC.w=world->explosion[i].w;
+        //on affiche la sélection dans la zone de l'ennemi
+        SDL_RenderCopy(renderer,ressources->explosion,&SRC,&DEST);
+    }
 }

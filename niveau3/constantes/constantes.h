@@ -29,7 +29,7 @@
  * @brief Taille du Mini boss
  * 
  */
-#define MBOSS_SIZE 135
+#define MBOSS_SIZE 170
 
 /**
  * \brief Taille du missile
@@ -68,8 +68,7 @@
  */
 #define LIFE_NUMBER 3
 /**
- * @brief nombre de vagues d'ennemies
- * 
+ * @brief nombre de vagues d'ennemies 
  */
 #define NB_WAVE 10
 /**
@@ -87,13 +86,19 @@ enum etat {gagnant,perdu,fin,jeu,menu,stop,saisie,highscore};
 /**
  * @brief taille du boss final
  */
-#define BOSS_SIZE 245
+#define BOSS_SIZE 180
 
-#define NB_BOSS_SBIRES 50
+#define NB_SBIRES 200
 
-#define BOSS_SBIRES_SPEED 2
+#define BOSS_SBIRES_SPEED 1
 
 #define NB_BOSS_LIFE 10
 
+#define MBOSS_SHOOT_COOLDOWN 50
+/**
+ * @brief délai entre deux tir
+ */
+#define BOSS_SHOOT_COOLDOWN 150
 
+#define NB_MISSILES 3
 #endif

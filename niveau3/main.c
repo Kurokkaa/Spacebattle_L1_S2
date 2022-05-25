@@ -11,7 +11,7 @@
 #include "SDL_graphics/SDL_graphics.h"
 #include "sdl2/sdl2-ttf-light.h"
 #include "sdl2/sdl2-audio.h"
-void clean_texture_textures_enemies(SDL_Texture** texture){
+void clean_texture_enemies(SDL_Texture** texture,SDL_Texture** texture_boss){
     int i;
     for(i=0;i<NB_ENEMIES;i++){
         if(NULL != texture[i]){
@@ -36,10 +36,16 @@ void clean_ressources(ressources_t *ressources,audio_t* sound){
     clean_texture(ressources->mini_boss_G);
     clean_texture(ressources->quitter_menu);
     clean_texture(ressources->highscore_menu);
+    clean_texture(ressources->missile_mboss);
+    clean_texture(ressources->bossp1);
+    clean_texture(ressources->bossp2);
     clean_texture(ressources->missile_boss);
-    clean_texture_textures_enemies(ressources->skin_ennemy);
+    clean_texture_enemies(ressources->skin_ennemy,ressources->skin_boss_enemy);
+    
+    
     clean_audio(sound);
     clean_font(ressources->font);
+
     
 }
 /**
@@ -51,8 +57,9 @@ void clean_ressources(ressources_t *ressources,audio_t* sound){
 void init_textures_enemies(SDL_Renderer *renderer, ressources_t *ressources){
     for(int i = 0;i<NB_ENEMIES;i++){
         ressources->skin_ennemy[i]=load_image("ressources/enemy.bmp",renderer);
+        ressources->life_texture[i]=load_image("ressources/coeur_plein.bmp",renderer);
     }
-    for(int i = 0;i<NB_BOSS_SBIRES;i++){
+    for(int i = 0;i<NB_SBIRES;i++){
         ressources->skin_boss_enemy[i]=load_image("ressources/enemy.bmp",renderer);
     }
 }
@@ -93,13 +100,13 @@ void init_ressources(SDL_Renderer *renderer, ressources_t *ressources,audio_t* a
 
     ressources->mini_boss_G = load_image("ressources/boss1g.bmp",renderer);
 
-    ressources->missile_boss = load_image("ressources/missilemb.bmp",renderer);
-
-    ressources->lose_background = load_image("ressources/lose.bmp",renderer);
+    ressources->missile_mboss = load_image("ressources/missilemb.bmp",renderer);
     
     ressources->bossp1 = load_image("ressources/bossp1.bmp",renderer);
 
     ressources->bossp2 = load_image("ressources/bossp2.bmp",renderer);
+
+    ressources->missile_boss = load_image("ressources/missile_boss.bmp",renderer);
 
     init_music(audio);
 }
@@ -125,11 +132,10 @@ void clean(SDL_Window *window, SDL_Renderer * renderer, ressources_t *ressources
  * @param world 
  */
 void init(SDL_Window **window, SDL_Renderer ** renderer, ressources_t *ressources, world_t * world,audio_t* audio){
-    
     init_sdl(window,renderer,SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_data(world);
     init_ttf();
     init_audio();
-    init_data(world);
     init_ressources(*renderer,ressources,audio);
     
 }
